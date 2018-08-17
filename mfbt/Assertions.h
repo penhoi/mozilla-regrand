@@ -455,10 +455,12 @@ struct AssertionConditionType
 
 #ifdef DEBUG
 #  define MOZ_ASSERT(...) MOZ_RELEASE_ASSERT(__VA_ARGS__)
+#define YPHPRINTF printf
 #else
 #  define MOZ_ASSERT(...) do { } while (0)
+#define YPHPRINTF
 #endif /* DEBUG */
-#define YPH_ASSERT  MOZ_ASSERT
+#define YPHASSERT  MOZ_ASSERT
 
 #if defined(NIGHTLY_BUILD) || defined(MOZ_DEV_EDITION)
 #  define MOZ_DIAGNOSTIC_ASSERT MOZ_RELEASE_ASSERT
