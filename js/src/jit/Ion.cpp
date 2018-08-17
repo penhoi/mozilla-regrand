@@ -744,6 +744,7 @@ JitCode*
 JitCode::New(JSContext* cx, uint8_t* code, uint32_t bufferSize, uint32_t headerSize,
              ExecutablePool* pool, CodeKind kind)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     JitCode* codeObj = Allocate<JitCode, allowGC>(cx);
     if (!codeObj) {
         pool->release(headerSize + bufferSize, kind);
@@ -880,6 +881,7 @@ IonScript::IonScript()
     osrPcMismatchCounter_(0),
     fallbackStubSpace_()
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 IonScript*
@@ -893,6 +895,7 @@ IonScript::New(JSContext* cx, RecompileInfo recompileInfo,
                size_t backedgeEntries, size_t sharedStubEntries,
                OptimizationLevel optimizationLevel)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     constexpr size_t DataAlignment = sizeof(void*);
 
     if (snapshotsListSize >= MAX_BUFFER_SIZE ||

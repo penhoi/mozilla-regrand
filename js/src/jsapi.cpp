@@ -4699,6 +4699,7 @@ ExecuteScript(JSContext* cx, HandleObject scope, HandleScript script, Value* rva
     CHECK_REQUEST(cx);
     assertSameCompartment(cx, scope, script);
     MOZ_ASSERT_IF(!IsGlobalLexicalEnvironment(scope), script->hasNonSyntacticScope());
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     return Execute(cx, script, *scope, rval);
 }
 
@@ -4717,7 +4718,7 @@ ExecuteScript(JSContext* cx, AutoObjectVector& envChain, HandleScript scriptArg,
             return false;
         js::Debugger::onNewScript(cx, script);
     }
-
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     return ExecuteScript(cx, env, script, rval);
 }
 

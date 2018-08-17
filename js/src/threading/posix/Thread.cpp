@@ -83,6 +83,7 @@ js::Thread::~Thread()
 js::Thread::Thread(Thread&& aOther)
   : idMutex_(mutexid::ThreadId)
 {
+  YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
   LockGuard<Mutex> lock(aOther.idMutex_);
   id_ = aOther.id_;
   aOther.id_ = Id();

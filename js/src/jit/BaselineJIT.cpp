@@ -83,7 +83,9 @@ BaselineScript::BaselineScript(uint32_t prologueOffset, uint32_t epilogueOffset,
     maxInliningDepth_(UINT8_MAX),
     pendingBuilder_(nullptr),
     controlFlowGraph_(nullptr)
-{ }
+{
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+}
 
 static bool
 CheckFrame(InterpreterFrame* fp)
@@ -302,39 +304,41 @@ CanEnterBaselineJIT(JSContext* cx, HandleScript script, InterpreterFrame* osrFra
 MethodStatus
 jit::CanEnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, bool newType)
 {
-   if (!CheckFrame(fp))
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    if (!CheckFrame(fp))
        return Method_CantCompile;
 
-   // This check is needed in the following corner case. Consider a function h,
-   //
-   //   function h(x) {
-   //      h(false);
-   //      if (!x)
-   //        return;
-   //      for (var i = 0; i < N; i++)
-   //         /* do stuff */
-   //   }
-   //
-   // Suppose h is not yet compiled in baseline and is executing in the
-   // interpreter. Let this interpreter frame be f_older. The debugger marks
-   // f_older as isDebuggee. At the point of the recursive call h(false), h is
-   // compiled in baseline without debug instrumentation, pushing a baseline
-   // frame f_newer. The debugger never flags f_newer as isDebuggee, and never
-   // recompiles h. When the recursive call returns and execution proceeds to
-   // the loop, the interpreter attempts to OSR into baseline. Since h is
-   // already compiled in baseline, execution jumps directly into baseline
-   // code. This is incorrect as h's baseline script does not have debug
-   // instrumentation.
-   if (fp->isDebuggee() && !Debugger::ensureExecutionObservabilityOfOsrFrame(cx, fp))
+    // This check is needed in the following corner case. Consider a function h,
+    //
+    //   function h(x) {
+    //      h(false);
+    //      if (!x)
+    //        return;
+    //      for (var i = 0; i < N; i++)
+    //         /* do stuff */
+    //   }
+    //
+    // Suppose h is not yet compiled in baseline and is executing in the
+    // interpreter. Let this interpreter frame be f_older. The debugger marks
+    // f_older as isDebuggee. At the point of the recursive call h(false), h is
+    // compiled in baseline without debug instrumentation, pushing a baseline
+    // frame f_newer. The debugger never flags f_newer as isDebuggee, and never
+    // recompiles h. When the recursive call returns and execution proceeds to
+    // the loop, the interpreter attempts to OSR into baseline. Since h is
+    // already compiled in baseline, execution jumps directly into baseline
+    // code. This is incorrect as h's baseline script does not have debug
+    // instrumentation.
+    if (fp->isDebuggee() && !Debugger::ensureExecutionObservabilityOfOsrFrame(cx, fp))
        return Method_Error;
 
-   RootedScript script(cx, fp->script());
-   return CanEnterBaselineJIT(cx, script, fp);
+    RootedScript script(cx, fp->script());
+    return CanEnterBaselineJIT(cx, script, fp);
 }
 
 MethodStatus
 jit::CanEnterBaselineMethod(JSContext* cx, RunState& state)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     if (state.isInvoke()) {
         InvokeState& invoke = *state.asInvoke();
         if (invoke.args().length() > BASELINE_MAX_ARGS_LENGTH) {

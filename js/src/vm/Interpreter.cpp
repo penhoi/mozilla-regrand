@@ -419,7 +419,7 @@ js::RunScript(JSContext* cx, RunState& state)
         InvokeState& invoke = *state.asInvoke();
         TypeMonitorCall(cx, invoke.args(), invoke.constructing());
     }
-
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     return Interpret(cx, state);
 }
 #ifdef _MSC_VER
@@ -492,6 +492,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
             return false;
     }
 
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     bool ok = RunScript(cx, state);
 
     MOZ_ASSERT_IF(ok && construct, args.rval().isObject());
@@ -703,6 +704,7 @@ js::ExecuteKernel(JSContext* cx, HandleScript script, JSObject& envChainArg,
 
     probes::StartExecution(script);
     ExecuteState state(cx, script, newTargetValue, envChainArg, evalInFrame, result);
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     bool ok = RunScript(cx, state);
     probes::StopExecution(script);
 
@@ -735,6 +737,7 @@ js::Execute(JSContext* cx, HandleScript script, JSObject& envChainArg, Value* rv
     } while ((s = s->enclosingEnvironment()));
 #endif
 
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     return ExecuteKernel(cx, script, *envChain, NullValue(),
                          NullFramePtr() /* evalInFrame */, rval);
 }
@@ -1936,6 +1939,7 @@ Interpret(JSContext* cx, RunState& state)
     INIT_COVERAGE();
     COUNT_COVERAGE_MAIN();
 
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     // Enter the interpreter loop starting at the current pc.
     ADVANCE_AND_DISPATCH(0);
 

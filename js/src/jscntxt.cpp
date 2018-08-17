@@ -1359,6 +1359,7 @@ JSContext::JSContext(JSRuntime* runtime, const JS::ContextOptions& options)
     promiseRejectionTrackerCallback(nullptr),
     promiseRejectionTrackerCallbackData(nullptr)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     MOZ_ASSERT(static_cast<JS::RootingContext*>(this) ==
                JS::RootingContext::get(this));
 
@@ -1407,6 +1408,7 @@ JSContext::~JSContext()
 void
 JSContext::setRuntime(JSRuntime* rt)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     MOZ_ASSERT(!resolvingList);
     MOZ_ASSERT(!compartment());
     MOZ_ASSERT(!activation());

@@ -2688,6 +2688,7 @@ ScriptDataSize(uint32_t nscopes, uint32_t nconsts, uint32_t nobjects,
 void
 JSScript::initCompartment(JSContext* cx)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     compartment_ = cx->compartment();
 }
 
@@ -2696,6 +2697,7 @@ JSScript::Create(JSContext* cx, const ReadOnlyCompileOptions& options,
                  HandleObject sourceObject, uint32_t bufStart, uint32_t bufEnd,
                  uint32_t toStringStart, uint32_t toStringEnd)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     // bufStart and bufEnd specify the range of characters parsed by the
     // Parser to produce this script. toStringStart and toStringEnd specify
     // the range of characters to be returned for Function.prototype.toString.
@@ -4274,6 +4276,7 @@ LazyScript::LazyScript(JSFunction* fun, void* table, uint64_t packedFields,
     lineno_(lineno),
     column_(column)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     MOZ_ASSERT(begin <= end);
     MOZ_ASSERT(toStringStart <= begin);
 }

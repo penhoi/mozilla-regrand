@@ -513,6 +513,7 @@ inline void
 JSContext::setCompartment(JSCompartment* comp,
                           const js::AutoLockForExclusiveAccess* maybeLock /* = nullptr */)
 {
+    //YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     // Only one thread can be in the atoms compartment at a time.
     MOZ_ASSERT_IF(runtime_->isAtomsCompartment(comp), maybeLock != nullptr);
     MOZ_ASSERT_IF(runtime_->isAtomsCompartment(comp) || runtime_->isAtomsCompartment(compartment_),

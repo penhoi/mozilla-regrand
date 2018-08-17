@@ -125,6 +125,7 @@ EnterJit(JSContext* cx, RunState& state, uint8_t* code)
 EnterJitStatus
 js::jit::MaybeEnterJit(JSContext* cx, RunState& state)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     JSScript* script = state.script();
 
     uint8_t* code = script->jitCodeRaw();

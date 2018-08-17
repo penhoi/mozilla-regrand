@@ -1811,6 +1811,7 @@ HelperThread::destroy()
 void
 HelperThread::ThreadMain(void* arg)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     ThisThread::SetName("JS Helper");
 
     static_cast<HelperThread*>(arg)->threadLoop();
@@ -2214,6 +2215,7 @@ HelperThread::handleGCHelperWorkload(AutoLockHelperThreadState& locked)
 void
 JSContext::setHelperThread(HelperThread* thread)
 {
+    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
     helperThread_ = thread;
 }
 
