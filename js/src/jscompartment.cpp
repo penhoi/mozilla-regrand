@@ -95,7 +95,7 @@ JSCompartment::JSCompartment(Zone* zone, const JS::CompartmentOptions& options =
     iterResultTemplate_(nullptr),
     lcovOutput()
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     PodArrayZero(sawDeprecatedLanguageExtension);
     runtime_->numCompartments++;
     MOZ_ASSERT_IF(creationOptions_.mergeable(),
@@ -134,6 +134,7 @@ JSCompartment::~JSCompartment()
 bool
 JSCompartment::init(JSContext* maybecx)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     /*
      * maybecx is null when called to create the atoms compartment from
      * JSRuntime::init().

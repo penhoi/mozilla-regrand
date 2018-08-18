@@ -84,7 +84,7 @@ BaselineScript::BaselineScript(uint32_t prologueOffset, uint32_t epilogueOffset,
     pendingBuilder_(nullptr),
     controlFlowGraph_(nullptr)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
 }
 
 static bool
@@ -304,7 +304,7 @@ CanEnterBaselineJIT(JSContext* cx, HandleScript script, InterpreterFrame* osrFra
 MethodStatus
 jit::CanEnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, bool newType)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (!CheckFrame(fp))
        return Method_CantCompile;
 
@@ -338,7 +338,7 @@ jit::CanEnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, bool newType)
 MethodStatus
 jit::CanEnterBaselineMethod(JSContext* cx, RunState& state)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (state.isInvoke()) {
         InvokeState& invoke = *state.asInvoke();
         if (invoke.args().length() > BASELINE_MAX_ARGS_LENGTH) {

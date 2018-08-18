@@ -101,6 +101,7 @@ js::AutoCycleDetector::~AutoCycleDetector()
 bool
 JSContext::init(ContextKind kind)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     // Skip most of the initialization if this thread will not be running JS.
     if (kind == ContextKind::Cooperative) {
         // Get a platform-native handle for this thread, used by js::InterruptRunningJitCode.
@@ -1359,7 +1360,7 @@ JSContext::JSContext(JSRuntime* runtime, const JS::ContextOptions& options)
     promiseRejectionTrackerCallback(nullptr),
     promiseRejectionTrackerCallbackData(nullptr)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(static_cast<JS::RootingContext*>(this) ==
                JS::RootingContext::get(this));
 
@@ -1408,7 +1409,7 @@ JSContext::~JSContext()
 void
 JSContext::setRuntime(JSRuntime* rt)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(!resolvingList);
     MOZ_ASSERT(!compartment());
     MOZ_ASSERT(!activation());

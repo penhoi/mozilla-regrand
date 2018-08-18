@@ -2613,6 +2613,7 @@ js::FillSelfHostingCompileOptions(CompileOptions& options)
 GlobalObject*
 JSRuntime::createSelfHostingGlobal(JSContext* cx)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(!cx->isExceptionPending());
     MOZ_ASSERT(!cx->runtime()->isAtomsCompartment(cx->compartment()));
 
@@ -2746,6 +2747,7 @@ VerifyGlobalNames(JSContext* cx, Handle<GlobalObject*> shg)
 bool
 JSRuntime::initSelfHosting(JSContext* cx)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(!selfHostingGlobal_);
 
     if (cx->runtime()->parentRuntime) {

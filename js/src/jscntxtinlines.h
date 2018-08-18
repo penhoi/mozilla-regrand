@@ -452,6 +452,7 @@ JSContext::runningWithTrustedPrincipals()
 inline void
 JSContext::enterNonAtomsCompartment(JSCompartment* c)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     enterCompartmentDepth_++;
 
     MOZ_ASSERT(!c->zone()->isAtomsZone());
@@ -467,6 +468,7 @@ inline void
 JSContext::enterAtomsCompartment(JSCompartment* c,
                                  const js::AutoLockForExclusiveAccess& lock)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     enterCompartmentDepth_++;
 
     MOZ_ASSERT(c->zone()->isAtomsZone());
@@ -479,6 +481,7 @@ template <typename T>
 inline void
 JSContext::enterCompartmentOf(const T& target)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(JS::CellIsNotGray(target));
     enterNonAtomsCompartment(target->compartment());
 }
@@ -486,6 +489,7 @@ JSContext::enterCompartmentOf(const T& target)
 inline void
 JSContext::enterNullCompartment()
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     enterCompartmentDepth_++;
     setCompartment(nullptr);
 }
@@ -513,7 +517,7 @@ inline void
 JSContext::setCompartment(JSCompartment* comp,
                           const js::AutoLockForExclusiveAccess* maybeLock /* = nullptr */)
 {
-    //YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     // Only one thread can be in the atoms compartment at a time.
     MOZ_ASSERT_IF(runtime_->isAtomsCompartment(comp), maybeLock != nullptr);
     MOZ_ASSERT_IF(runtime_->isAtomsCompartment(comp) || runtime_->isAtomsCompartment(compartment_),

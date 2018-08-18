@@ -1,3 +1,4 @@
+
 /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  * vim: set ts=8 sts=4 et sw=4 tw=99:
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -4699,7 +4700,7 @@ ExecuteScript(JSContext* cx, HandleObject scope, HandleScript script, Value* rva
     CHECK_REQUEST(cx);
     assertSameCompartment(cx, scope, script);
     MOZ_ASSERT_IF(!IsGlobalLexicalEnvironment(scope), script->hasNonSyntacticScope());
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return Execute(cx, script, *scope, rval);
 }
 
@@ -4718,7 +4719,7 @@ ExecuteScript(JSContext* cx, AutoObjectVector& envChain, HandleScript scriptArg,
             return false;
         js::Debugger::onNewScript(cx, script);
     }
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return ExecuteScript(cx, env, script, rval);
 }
 

@@ -54,7 +54,7 @@ class JitCode : public gc::TenuredCell
       : code_(nullptr),
         pool_(nullptr)
     {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     }
 
     JitCode(uint8_t* code, uint32_t bufferSize, uint32_t headerSize, ExecutablePool* pool,
@@ -71,7 +71,7 @@ class JitCode : public gc::TenuredCell
         invalidated_(false),
         hasBytecodeMap_(false)
     {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         MOZ_ASSERT(CodeKind(kind_) == kind);
         MOZ_ASSERT(headerSize_ == headerSize);
     }

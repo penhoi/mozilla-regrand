@@ -939,6 +939,7 @@ static const uint32_t HELPER_STACK_QUOTA = kDefaultHelperStackQuota;
 bool
 GlobalHelperThreadState::ensureInitialized()
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(CanUseExtraThreads());
 
     MOZ_ASSERT(this == &HelperThreadState());
@@ -979,7 +980,7 @@ GlobalHelperThreadState::GlobalHelperThreadState()
    wasmTier2GeneratorsFinished_(0),
    helperLock(mutexid::GlobalHelperThreadState)
 {
-    cpuCount = ClampDefaultCPUCount(GetCPUCount());
+    cpuCount = 1;//ClampDefaultCPUCount(GetCPUCount());
     threadCount = ThreadCountForCPUCount(cpuCount);
 
     MOZ_ASSERT(cpuCount > 0, "GetCPUCount() seems broken");
@@ -1811,7 +1812,7 @@ HelperThread::destroy()
 void
 HelperThread::ThreadMain(void* arg)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     ThisThread::SetName("JS Helper");
 
     static_cast<HelperThread*>(arg)->threadLoop();
@@ -2215,7 +2216,7 @@ HelperThread::handleGCHelperWorkload(AutoLockHelperThreadState& locked)
 void
 JSContext::setHelperThread(HelperThread* thread)
 {
-    YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     helperThread_ = thread;
 }
 
@@ -2227,6 +2228,7 @@ HelperThread::threadLoop()
     JS::AutoSuppressGCAnalysis nogc;
     AutoLockHelperThreadState lock;
 
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JSContext cx(nullptr, JS::ContextOptions());
     {
         AutoEnterOOMUnsafeRegion oomUnsafe;

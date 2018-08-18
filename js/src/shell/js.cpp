@@ -708,7 +708,7 @@ RunFile(JSContext* cx, const char* filename, FILE* file, bool compileOnly)
                .setIsRunOnce(true)
                .setNoScriptRval(true);
 
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!JS::Compile(cx, options, file, &script))
             return false;
         MOZ_ASSERT(script);
@@ -719,7 +719,7 @@ RunFile(JSContext* cx, const char* filename, FILE* file, bool compileOnly)
             AnalyzeEntrainedVariables(cx, script);
     #endif
     if (!compileOnly) {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!JS_ExecuteScript(cx, script))
             return false;
         int64_t t2 = PRMJ_Now() - t1;
@@ -1072,11 +1072,11 @@ Process(JSContext* cx, const char* filename, bool forceTTY, FileKind kind = File
     if (!forceTTY && !isatty(fileno(file))) {
         // It's not interactive - just execute it.
         if (kind == FileScript) {
-            YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+            YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             if (!RunFile(cx, filename, file, compileOnly))
                 return false;
         } else {
-            YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+            YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             if (!RunModule(cx, filename, file, compileOnly))
                 return false;
         }
@@ -8152,7 +8152,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
         modulePaths.empty() &&
         !op->getStringArg("script"))
     {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         return Process(cx, nullptr, true); /* Interactive. */
     }
 
@@ -8183,7 +8183,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
 
         if (fpArgno < ccArgno && fpArgno < mpArgno) {
             char* path = filePaths.front();
-            YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+            YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             if (!Process(cx, path, false, FileScript))
                 return false;
             filePaths.popFront();
@@ -8200,7 +8200,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
         } else {
             MOZ_ASSERT(mpArgno < fpArgno && mpArgno < ccArgno);
             char* path = modulePaths.front();
-            YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+            YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             if (!Process(cx, path, false, FileModule))
                 return false;
             modulePaths.popFront();
@@ -8212,13 +8212,13 @@ ProcessArgs(JSContext* cx, OptionParser* op)
 
     /* The |script| argument is processed after all options. */
     if (const char* path = op->getStringArg("script")) {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!Process(cx, path, false))
             return false;
     }
 
     if (op->getBoolOption('i')) {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!Process(cx, nullptr, true))
             return false;
     }
@@ -8583,10 +8583,10 @@ Shell(JSContext* cx, OptionParser* op, char** envp)
     int result = EXIT_SUCCESS;
     {
         AutoReportException are(cx);
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!ProcessArgs(cx, op) && !sc->quitting)
             result = EXITCODE_RUNTIME_ERROR;
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     }
 
     /*
@@ -8595,9 +8595,9 @@ Shell(JSContext* cx, OptionParser* op, char** envp)
      * uncaught exceptions have been reported since draining runs callbacks.
      */
     if (!GetShellContext(cx)->quitting) {
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         js::RunJobs(cx);
-        YPHPRINTF("%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__);
+        YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     }
 
     if (sc->exitCode)

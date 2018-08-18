@@ -4869,6 +4869,7 @@ BytecodeEmitter::emitSetThis(ParseNode* pn)
 bool
 BytecodeEmitter::emitScript(ParseNode* body)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     AutoFrontendTraceLog traceLog(cx, TraceLogger_BytecodeEmission, tokenStream(), body);
 
     TDZCheckCache tdzCache(this);
@@ -7750,6 +7751,7 @@ BytecodeEmitter::emitFor(ParseNode* pn, EmitterScope* headLexicalEmitterScope)
 MOZ_NEVER_INLINE bool
 BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
 {
+    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     FunctionBox* funbox = pn->pn_funbox;
     RootedFunction fun(cx, funbox->function());
     RootedAtom name(cx, fun->explicitName());
@@ -8727,6 +8729,7 @@ BytecodeEmitter::emitStatementList(ParseNode* pn)
 {
     MOZ_ASSERT(pn->isArity(PN_LIST));
     for (ParseNode* pn2 = pn->pn_head; pn2; pn2 = pn2->pn_next) {
+        YPHPRINTF("thread_%d:%s:%d:%s:loop\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!emitTree(pn2))
             return false;
     }
