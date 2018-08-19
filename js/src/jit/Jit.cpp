@@ -125,7 +125,7 @@ EnterJit(JSContext* cx, RunState& state, uint8_t* code)
 EnterJitStatus
 js::jit::MaybeEnterJit(JSContext* cx, RunState& state)
 {
-    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JSScript* script = state.script();
 
     uint8_t* code = script->jitCodeRaw();

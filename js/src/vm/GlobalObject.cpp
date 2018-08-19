@@ -351,7 +351,7 @@ GlobalObject::new_(JSContext* cx, const Class* clasp, JSPrincipals* principals,
     MOZ_ASSERT(!cx->isExceptionPending());
     MOZ_ASSERT(!cx->runtime()->isAtomsCompartment(cx->compartment()));
 
-    YPHPRINTF("thread_%d:%s:%d:%s:createt JSCompartment\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:createt JSCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JSCompartment* compartment = NewCompartment(cx, principals, options);
     if (!compartment)
         return nullptr;

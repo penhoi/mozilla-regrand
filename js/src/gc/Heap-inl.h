@@ -15,7 +15,7 @@
 inline void
 js::gc::Arena::init(JS::Zone* zoneArg, AllocKind kind)
 {
-    YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(firstFreeSpan.isEmpty());
     MOZ_ASSERT(!zone);
     MOZ_ASSERT(!allocated());

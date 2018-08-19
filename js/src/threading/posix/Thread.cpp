@@ -83,7 +83,7 @@ js::Thread::~Thread()
 js::Thread::Thread(Thread&& aOther)
   : idMutex_(mutexid::ThreadId)
 {
-  YPHPRINTF("thread_%d:%s:%d:%s\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+  YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
   LockGuard<Mutex> lock(aOther.idMutex_);
   id_ = aOther.id_;
   aOther.id_ = Id();
@@ -113,7 +113,7 @@ js::Thread::create(void* (*aMain)(void*), void* aArg)
     r = pthread_attr_setstacksize(&attrs, options_.stackSize());
     MOZ_RELEASE_ASSERT(!r);
   }
-  YPHPRINTF("thread_%d:%s:%d:%s: pthread_create\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+  YPHPRINTF("thread_%ld:%s:%d:%s: pthread_create\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
   r = pthread_create(&id_.platformData()->ptThread, &attrs, aMain, aArg);
   if (r) {
     // |pthread_create| may leave id_ in an undefined state.
@@ -129,7 +129,7 @@ js::Thread::join()
 {
   LockGuard<Mutex> lock(idMutex_);
   MOZ_RELEASE_ASSERT(joinable(lock));
-  YPHPRINTF("thread_%d:%s:%d:%s: pthread_join\n", getpid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+  YPHPRINTF("thread_%ld:%s:%d:%s: pthread_join\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
   int r = pthread_join(id_.platformData()->ptThread, nullptr);
   MOZ_RELEASE_ASSERT(!r);
   id_ = Id();
