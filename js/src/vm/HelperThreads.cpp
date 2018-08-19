@@ -939,7 +939,6 @@ static const uint32_t HELPER_STACK_QUOTA = kDefaultHelperStackQuota;
 bool
 GlobalHelperThreadState::ensureInitialized()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(CanUseExtraThreads());
 
     MOZ_ASSERT(this == &HelperThreadState());
@@ -952,6 +951,7 @@ GlobalHelperThreadState::ensureInitialized()
     if (!threads || !threads->initCapacity(threadCount))
         return false;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create threadCount=%ld threads\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, threadCount);
     for (size_t i = 0; i < threadCount; i++) {
         threads->infallibleEmplaceBack();
         HelperThread& helper = (*threads)[i];
@@ -980,7 +980,7 @@ GlobalHelperThreadState::GlobalHelperThreadState()
    wasmTier2GeneratorsFinished_(0),
    helperLock(mutexid::GlobalHelperThreadState)
 {
-    cpuCount = 1;//ClampDefaultCPUCount(GetCPUCount());
+    cpuCount = ClampDefaultCPUCount(GetCPUCount());
     threadCount = ThreadCountForCPUCount(cpuCount);
 
     MOZ_ASSERT(cpuCount > 0, "GetCPUCount() seems broken");
@@ -1812,9 +1812,9 @@ HelperThread::destroy()
 void
 HelperThread::ThreadMain(void* arg)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     ThisThread::SetName("JS Helper");
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke threadLoop()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     static_cast<HelperThread*>(arg)->threadLoop();
     Mutex::ShutDown();
 }
@@ -2216,7 +2216,6 @@ HelperThread::handleGCHelperWorkload(AutoLockHelperThreadState& locked)
 void
 JSContext::setHelperThread(HelperThread* thread)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     helperThread_ = thread;
 }
 
@@ -2228,10 +2227,11 @@ HelperThread::threadLoop()
     JS::AutoSuppressGCAnalysis nogc;
     AutoLockHelperThreadState lock;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JSContext\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JSContext cx(nullptr, JS::ContextOptions());
     {
         AutoEnterOOMUnsafeRegion oomUnsafe;
+        YPHPRINTF("thread_%ld:%s:%d:%s:invoke JSContext::init(ContextKind::Background)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!cx.init(ContextKind::Background))
             oomUnsafe.crash("HelperThread cx.init()");
     }
@@ -2287,7 +2287,7 @@ HelperThread::threadLoop()
 
             HelperThreadState().wait(lock, GlobalHelperThreadState::PRODUCER);
         }
-
+        YPHPRINTF("thread_%ld:%s:%d:%s:handle workload\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         js::oom::SetThreadType(task);
         switch (task) {
           case js::THREAD_TYPE_GCPARALLEL:

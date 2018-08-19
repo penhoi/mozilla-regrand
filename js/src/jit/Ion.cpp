@@ -108,7 +108,6 @@ JitContext::JitContext(JSContext* cx, TempAllocator* temp)
     prev_(CurrentJitContext()),
     assemblerCount_(0)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     SetJitContext(this);
 }
 
@@ -237,7 +236,6 @@ JitRuntime::startTrampolineCode(MacroAssembler& masm)
 bool
 JitRuntime::initialize(JSContext* cx, AutoLockForExclusiveAccess& lock)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s: create JitContext\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     AutoAtomsCompartment ac(cx, lock);
 
     JitContext jctx(cx, nullptr);
@@ -248,6 +246,8 @@ JitRuntime::initialize(JSContext* cx, AutoLockForExclusiveAccess& lock)
     functionWrappers_ = cx->new_<VMWrapperMap>(cx);
     if (!functionWrappers_ || !functionWrappers_->init())
         return false;
+
+    YPHPRINTF("thread_%ld:%s:%d:%s:create stubs including bailoutTail && malloc stub && free stub ...\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
 
     MacroAssembler masm;
 
@@ -746,13 +746,13 @@ JitCode*
 JitCode::New(JSContext* cx, uint8_t* code, uint32_t bufferSize, uint32_t headerSize,
              ExecutablePool* pool, CodeKind kind)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JitCode* codeObj = Allocate<JitCode, allowGC>(cx);
     if (!codeObj) {
         pool->release(headerSize + bufferSize, kind);
         return nullptr;
     }
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JitCode instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     new (codeObj) JitCode(code, bufferSize, headerSize, pool, kind);
     return codeObj;
 }
@@ -883,7 +883,7 @@ IonScript::IonScript()
     osrPcMismatchCounter_(0),
     fallbackStubSpace_()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
 }
 
 IonScript*
@@ -897,7 +897,6 @@ IonScript::New(JSContext* cx, RecompileInfo recompileInfo,
                size_t backedgeEntries, size_t sharedStubEntries,
                OptimizationLevel optimizationLevel)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     constexpr size_t DataAlignment = sizeof(void*);
 
     if (snapshotsListSize >= MAX_BUFFER_SIZE ||
@@ -933,6 +932,7 @@ IonScript::New(JSContext* cx, RecompileInfo recompileInfo,
                    paddedSafepointSize +
                    paddedBackedgeSize +
                    paddedSharedStubSize;
+    YPHPRINTF("thread_%ld:%s:%d:%s:create IonScript with layoutinfo\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     IonScript* script = cx->zone()->pod_malloc_with_extra<IonScript, uint8_t>(bytes);
     if (!script)
         return nullptr;
@@ -2526,6 +2526,7 @@ jit::CanEnterIon(JSContext* cx, RunState& state)
     // If --ion-eager is used, compile with Baseline first, so that we
     // can directly enter IonMonkey.
     if (JitOptions.eagerCompilation && !script->hasBaselineScript()) {
+        YPHPRINTF("thread_%ld:%s:%d:%s:->jit::CanEnterBaselineMethod()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         MethodStatus status = CanEnterBaselineMethod(cx, state);
         if (status != Method_Compiled)
             return status;

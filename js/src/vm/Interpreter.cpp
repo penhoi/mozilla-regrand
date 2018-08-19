@@ -405,6 +405,7 @@ js::RunScript(JSContext* cx, RunState& state)
 
     state.script()->ensureNonLazyCanonicalFunction();
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:->jit::MaybeEnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     jit::EnterJitStatus status = jit::MaybeEnterJit(cx, state);
     switch (status) {
       case jit::EnterJitStatus::Error:
@@ -419,7 +420,7 @@ js::RunScript(JSContext* cx, RunState& state)
         InvokeState& invoke = *state.asInvoke();
         TypeMonitorCall(cx, invoke.args(), invoke.constructing());
     }
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:->Interpret()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return Interpret(cx, state);
 }
 #ifdef _MSC_VER
@@ -492,7 +493,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
             return false;
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:->RunScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     bool ok = RunScript(cx, state);
 
     MOZ_ASSERT_IF(ok && construct, args.rval().isObject());
@@ -704,7 +705,7 @@ js::ExecuteKernel(JSContext* cx, HandleScript script, JSObject& envChainArg,
 
     probes::StartExecution(script);
     ExecuteState state(cx, script, newTargetValue, envChainArg, evalInFrame, result);
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:->RunScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     bool ok = RunScript(cx, state);
     probes::StopExecution(script);
 
@@ -737,7 +738,7 @@ js::Execute(JSContext* cx, HandleScript script, JSObject& envChainArg, Value* rv
     } while ((s = s->enclosingEnvironment()));
 #endif
 
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:->ExecuteKernel()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return ExecuteKernel(cx, script, *envChain, NullValue(),
                          NullFramePtr() /* evalInFrame */, rval);
 }
@@ -1939,7 +1940,6 @@ Interpret(JSContext* cx, RunState& state)
     INIT_COVERAGE();
     COUNT_COVERAGE_MAIN();
 
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     // Enter the interpreter loop starting at the current pc.
     ADVANCE_AND_DISPATCH(0);
 
@@ -2041,6 +2041,7 @@ CASE(JSOP_LOOPENTRY)
     COUNT_COVERAGE();
     // Attempt on-stack replacement with Baseline code.
     if (jit::IsBaselineEnabled(cx)) {
+        YPHPRINTF("thread_%ld:%s:%d:%s:->jit::CanEnterBaselineAtBranch()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         jit::MethodStatus status = jit::CanEnterBaselineAtBranch(cx, REGS.fp(), false);
         if (status == jit::Method_Error)
             goto error;
@@ -3125,7 +3126,7 @@ CASE(JSOP_FUNCALL)
 
         {
             InvokeState state(cx, args, construct);
-
+            YPHPRINTF("thread_%ld:%s:%d:%s:->jit::MaybeEnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             jit::EnterJitStatus status = jit::MaybeEnterJit(cx, state);
             switch (status) {
               case jit::EnterJitStatus::Error:

@@ -4796,12 +4796,14 @@ Evaluate(JSContext* cx, ScopeKind scopeKind, HandleObject env,
     assertSameCompartment(cx, env);
     MOZ_ASSERT_IF(!IsGlobalLexicalEnvironment(env), scopeKind == ScopeKind::NonSyntactic);
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke CompileGlobalScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     options.setIsRunOnce(true);
     RootedScript script(cx, frontend::CompileGlobalScript(cx, cx->tempLifoAlloc(),
                                                           scopeKind, options, srcBuf));
     if (!script)
         return false;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke Execute() on global-script\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     bool result = Execute(cx, script, *env,
                           options.noScriptRval ? nullptr : rval.address());
 

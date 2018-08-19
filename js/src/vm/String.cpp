@@ -833,6 +833,7 @@ StaticStrings::init(JSContext* cx)
 
     using Latin1Range = mozilla::Range<const Latin1Char>;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create unitStaticTable && intStaticTable\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     for (uint32_t i = 0; i < UNIT_STATIC_LIMIT; i++) {
         Latin1Char buffer[] = { Latin1Char(i), '\0' };
         JSFlatString* s = NewInlineString<NoGC>(cx, Latin1Range(buffer, 1));

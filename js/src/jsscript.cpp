@@ -2688,7 +2688,7 @@ ScriptDataSize(uint32_t nscopes, uint32_t nconsts, uint32_t nobjects,
 void
 JSScript::initCompartment(JSContext* cx)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:bind to the JSCompartment of a JSContext instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     compartment_ = cx->compartment();
 }
 
@@ -2697,7 +2697,6 @@ JSScript::Create(JSContext* cx, const ReadOnlyCompileOptions& options,
                  HandleObject sourceObject, uint32_t bufStart, uint32_t bufEnd,
                  uint32_t toStringStart, uint32_t toStringEnd)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:script->initCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     // bufStart and bufEnd specify the range of characters parsed by the
     // Parser to produce this script. toStringStart and toStringEnd specify
     // the range of characters to be returned for Function.prototype.toString.
@@ -2705,6 +2704,8 @@ JSScript::Create(JSContext* cx, const ReadOnlyCompileOptions& options,
     MOZ_ASSERT(toStringStart <= toStringEnd);
     MOZ_ASSERT(toStringStart <= bufStart);
     MOZ_ASSERT(toStringEnd >= bufEnd);
+
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JSScript && invoke JSScript::initCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
 
     RootedScript script(cx, Allocate<JSScript>(cx));
     if (!script)
@@ -4276,7 +4277,7 @@ LazyScript::LazyScript(JSFunction* fun, void* table, uint64_t packedFields,
     lineno_(lineno),
     column_(column)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(begin <= end);
     MOZ_ASSERT(toStringStart <= begin);
 }

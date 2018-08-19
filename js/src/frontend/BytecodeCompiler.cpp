@@ -316,7 +316,7 @@ BytecodeCompiler::deoptimizeArgumentsInEnclosingScripts(JSContext* cx, HandleObj
 JSScript*
 BytecodeCompiler::compileScript(HandleObject environment, SharedContext* sc)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke createSourceAndParser() && createScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (!createSourceAndParser())
         return nullptr;
 
@@ -328,6 +328,7 @@ BytecodeCompiler::compileScript(HandleObject environment, SharedContext* sc)
         return nullptr;
 
     for (;;) {
+        YPHPRINTF("thread_%ld:%s:%d:%s:get ParseNode\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         ParseNode* pn;
         if (sc->isEvalContext())
             pn = parser->evalBody(sc->asEvalContext());
@@ -344,6 +345,7 @@ BytecodeCompiler::compileScript(HandleObject environment, SharedContext* sc)
                 if (!deoptimizeArgumentsInEnclosingScripts(cx, environment))
                     return nullptr;
             }
+            YPHPRINTF("thread_%ld:%s:%d:%s:invoke BytecodeEmitter::emitScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             if (!emitter->emitScript(pn))
                 return nullptr;
             if (!NameFunctions(cx, pn))
@@ -573,7 +575,16 @@ frontend::CompileGlobalScript(JSContext* cx, LifoAlloc& alloc, ScopeKind scopeKi
                               SourceBufferHolder& srcBuf,
                               ScriptSourceObject** sourceObjectOut)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    char *wbuf = (char*)srcBuf.get();
+    int len = srcBuf.length();
+    char* code = (char*)malloc(len+8);
+    int i;
+    for (i = 0; i< len; i++)
+        code[i] = wbuf[i*2];
+    for (i = len; i > 0 && code[i] != ';' && code[i] != '}'; i--);
+    code[i+1] = '\0';
+    YPHPRINTF("thread_%ld:%s:%d:%s:create BytecodeCompiler && invoke BytecodeCompiler::compileGlobalScript() on \n%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, code);
+    free(code);
     MOZ_ASSERT(scopeKind == ScopeKind::Global || scopeKind == ScopeKind::NonSyntactic);
     BytecodeCompiler compiler(cx, alloc, options, srcBuf, /* enclosingScope = */ nullptr);
     AutoInitializeSourceObject autoSSO(compiler, sourceObjectOut);
@@ -587,7 +598,16 @@ frontend::CompileEvalScript(JSContext* cx, LifoAlloc& alloc,
                             SourceBufferHolder& srcBuf,
                             ScriptSourceObject** sourceObjectOut)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    char *wbuf = (char*)srcBuf.get();
+    int len = srcBuf.length();
+    char* code = (char*)malloc(len+8);
+    int i;
+    for (i = 0; i< len; i++)
+        code[i] = wbuf[i*2];
+    for (i = len; i > 0 && code[i] != ';' && code[i] != '}'; i--);
+    code[i+1] = '\0';
+    YPHPRINTF("thread_%ld:%s:%d:%s:create BytecodeCompiler && invoke BytecodeCompiler::compileEvalScript() on \n%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, code);
+    free(code);
     BytecodeCompiler compiler(cx, alloc, options, srcBuf, enclosingScope);
     AutoInitializeSourceObject autoSSO(compiler, sourceObjectOut);
     return compiler.compileEvalScript(environment, enclosingScope);

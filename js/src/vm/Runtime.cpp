@@ -179,7 +179,7 @@ JSRuntime::JSRuntime(JSRuntime* parentRuntime)
     stackFormat_(parentRuntime ? js::StackFormat::Default
                                : js::StackFormat::SpiderMonkey)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     liveRuntimesCount++;
 
     /* Initialize infallibly first, so we can goto bad and JS_DestroyRuntime. */
@@ -204,6 +204,7 @@ JSRuntime::init(JSContext* cx, uint32_t maxbytes, uint32_t maxNurseryBytes)
     initialized_ = true;
 #endif
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke EnsureHelperThreadsInitialized()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (CanUseExtraThreads() && !EnsureHelperThreadsInitialized())
         return false;
 
@@ -215,6 +216,7 @@ JSRuntime::init(JSContext* cx, uint32_t maxbytes, uint32_t maxNurseryBytes)
     if (!defaultFreeOp_)
         return false;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke GCRuntime::init()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (!gc.init(maxbytes, maxNurseryBytes))
         return false;
 
@@ -222,7 +224,7 @@ JSRuntime::init(JSContext* cx, uint32_t maxbytes, uint32_t maxNurseryBytes)
     if (!atomsZone || !atomsZone->init(true))
         return false;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:js_new JSCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JSCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JS::CompartmentOptions options;
     ScopedJSDeletePtr<JSCompartment> atomsCompartment(js_new<JSCompartment>(atomsZone.get(), options));
     if (!atomsCompartment || !atomsCompartment->init(nullptr))

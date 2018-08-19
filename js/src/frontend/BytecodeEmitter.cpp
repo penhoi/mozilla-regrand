@@ -4869,7 +4869,6 @@ BytecodeEmitter::emitSetThis(ParseNode* pn)
 bool
 BytecodeEmitter::emitScript(ParseNode* body)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     AutoFrontendTraceLog traceLog(cx, TraceLogger_BytecodeEmission, tokenStream(), body);
 
     TDZCheckCache tdzCache(this);
@@ -4912,6 +4911,7 @@ BytecodeEmitter::emitScript(ParseNode* body)
         if (!lexicalEmitterScope.leave(this))
             return false;
     } else {
+        YPHPRINTF("thread_%ld:%s:%d:%s:->emitTree()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!emitTree(body))
             return false;
     }
@@ -7751,7 +7751,6 @@ BytecodeEmitter::emitFor(ParseNode* pn, EmitterScope* headLexicalEmitterScope)
 MOZ_NEVER_INLINE bool
 BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     FunctionBox* funbox = pn->pn_funbox;
     RootedFunction fun(cx, funbox->function());
     RootedAtom name(cx, fun->explicitName());
@@ -7842,6 +7841,7 @@ BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
             const TransitiveCompileOptions& transitiveOptions = parser.options();
             CompileOptions options(cx, transitiveOptions);
 
+            YPHPRINTF("thread_%ld:%s:%d:%s:create JSScript instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             Rooted<JSObject*> sourceObject(cx, script->sourceObject());
             Rooted<JSScript*> script(cx, JSScript::Create(cx, options, sourceObject,
                                                           funbox->bufStart, funbox->bufEnd,
@@ -8729,7 +8729,7 @@ BytecodeEmitter::emitStatementList(ParseNode* pn)
 {
     MOZ_ASSERT(pn->isArity(PN_LIST));
     for (ParseNode* pn2 = pn->pn_head; pn2; pn2 = pn2->pn_next) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:loop\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINTF("thread_%ld:%s:%d:%s:->emitTree()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!emitTree(pn2))
             return false;
     }

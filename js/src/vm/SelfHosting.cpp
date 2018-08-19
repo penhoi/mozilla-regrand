@@ -2747,7 +2747,6 @@ VerifyGlobalNames(JSContext* cx, Handle<GlobalObject*> shg)
 bool
 JSRuntime::initSelfHosting(JSContext* cx)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(!selfHostingGlobal_);
 
     if (cx->runtime()->parentRuntime) {
@@ -2793,6 +2792,7 @@ JSRuntime::initSelfHosting(JSContext* cx)
         return false;
     }
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:decompress & Evaluate self-hosted JS-code\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (!Evaluate(cx, options, src, srcLen, &rv))
         return false;
 

@@ -95,7 +95,7 @@ JSCompartment::JSCompartment(Zone* zone, const JS::CompartmentOptions& options =
     iterResultTemplate_(nullptr),
     lcovOutput()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     PodArrayZero(sawDeprecatedLanguageExtension);
     runtime_->numCompartments++;
     MOZ_ASSERT_IF(creationOptions_.mergeable(),
@@ -134,7 +134,6 @@ JSCompartment::~JSCompartment()
 bool
 JSCompartment::init(JSContext* maybecx)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     /*
      * maybecx is null when called to create the atoms compartment from
      * JSRuntime::init().
@@ -156,6 +155,7 @@ JSCompartment::init(JSContext* maybecx)
     if (!enumerators)
         return false;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:invoke SavedStacks::init() etc\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (!savedStacks_.init() ||
         !varNames_.init() ||
         !templateLiteralMap_.init() ||
@@ -184,6 +184,7 @@ JSRuntime::createJitRuntime(JSContext* cx)
         return nullptr;
     }
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JitRuntime && invoke JitRuntime::initialize()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     jit::JitRuntime* jrt = cx->new_<jit::JitRuntime>(cx->runtime());
     if (!jrt)
         return nullptr;
@@ -215,6 +216,7 @@ JSCompartment::ensureJitCompartmentExists(JSContext* cx)
     if (!zone()->getJitZone(cx))
         return false;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JitCompartment && invoke JitCompartment::initialize()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     /* Set the compartment early, so linking works. */
     jitCompartment_ = cx->new_<JitCompartment>();
 
