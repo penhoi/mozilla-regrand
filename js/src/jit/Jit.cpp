@@ -91,6 +91,8 @@ EnterJit(JSContext* cx, RunState& state, uint8_t* code)
         AssertCompartmentUnchanged pcc(cx);
         ActivationEntryMonitor entryMonitor(cx, calleeToken);
         JitActivation activation(cx);
+
+        YPHPRINTF("thread_%ld:%s:%d:%s:create EnterJitCode && ->CALL_GENERATED_CODE\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         EnterJitCode enter = cx->runtime()->jitRuntime()->enterJit();
 
 #ifdef DEBUG

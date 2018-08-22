@@ -858,6 +858,12 @@ class InterpreterRegs
         pc = script->code();
         sp = fp.slots() + script->nfixed();
         fp_ = &fp;
+        const char* name;
+        if (script->hasScriptName())
+            name = script->getScriptName();
+        else
+            name = "No Name";
+        YPHPRINTF("thread_%ld:%s:%d:%s:prepareToRun %s: set pc & sp\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, name);
     }
 
     void setToEndOfScript();
@@ -903,7 +909,9 @@ class InterpreterStack
     InterpreterStack()
       : allocator_(DEFAULT_CHUNK_SIZE),
         frameCount_(0)
-    { }
+    {
+        YPHPRINTF("thread_%ld:%s:%d:%s:constructor this@%p\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+    }
 
     ~InterpreterStack() {
         MOZ_ASSERT(frameCount_ == 0);

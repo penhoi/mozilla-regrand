@@ -704,8 +704,8 @@ js::ExecuteKernel(JSContext* cx, HandleScript script, JSObject& envChainArg,
     }
 
     probes::StartExecution(script);
+    YPHPRINTF("thread_%ld:%s:%d:%s:create ExecuteState && ->RunScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     ExecuteState state(cx, script, newTargetValue, envChainArg, evalInFrame, result);
-    YPHPRINTF("thread_%ld:%s:%d:%s:->RunScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     bool ok = RunScript(cx, state);
     probes::StopExecution(script);
 
@@ -1739,7 +1739,9 @@ Interpret(JSContext* cx, RunState& state)
      __SUNPRO_C >= 0x570)
 // Non-standard but faster indirect-goto-based dispatch.
 # define INTERPRETER_LOOP()
-# define CASE(OP)                 label_##OP:
+# define CASE(OP)                 label_##OP:   \
+                                  YPHPRINTF("label:%s\n", #OP);
+
 # define DEFAULT()                label_default:
 # define DISPATCH_TO(OP)          goto* addresses[(OP)]
 
@@ -1761,7 +1763,9 @@ Interpret(JSContext* cx, RunState& state)
 #else
 // Portable switch-based dispatch.
 # define INTERPRETER_LOOP()       the_switch: switch (switchOp)
-# define CASE(OP)                 case OP:
+# define CASE(OP)                 case OP:      \
+                                  YPHPRINTF("OP-code:%s\n", #OP);
+
 # define DEFAULT()                default:
 # define DISPATCH_TO(OP)                                                      \
     JS_BEGIN_MACRO                                                            \
@@ -1890,6 +1894,13 @@ Interpret(JSContext* cx, RunState& state)
     /* The script is used frequently, so keep a local copy. */
     RootedScript script(cx);
     SET_SCRIPT(REGS.fp()->script());
+    const char* name;
+    if (script->hasScriptName())
+        name = script->getScriptName();
+    else
+        name = "No Name";
+    YPHPRINTF("thread_%ld:%s:%d:%s:interpre script: %s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, name);
+
 
     TraceLoggerThread* logger = TraceLoggerForCurrentThread(cx);
     TraceLoggerEvent scriptEvent(TraceLogger_Scripts, script);
@@ -1941,7 +1952,10 @@ Interpret(JSContext* cx, RunState& state)
     COUNT_COVERAGE_MAIN();
 
     // Enter the interpreter loop starting at the current pc.
+    DumpPC(cx);
+    YPHPRINTF("thread_%ld:%s:%d:%s:Enter the interpreter loop\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     ADVANCE_AND_DISPATCH(0);
+
 
 INTERPRETER_LOOP() {
 

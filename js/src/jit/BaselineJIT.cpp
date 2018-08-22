@@ -130,6 +130,7 @@ EnterBaseline(JSContext* cx, EnterJitData& data)
     MOZ_ASSERT(jit::IsBaselineEnabled(cx));
     MOZ_ASSERT(CheckFrame(data.osrFrame));
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create EnterJitCode & ->CALL_GENERATED_CODE\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     EnterJitCode enter = cx->runtime()->jitRuntime()->enterJit();
 
     // Caller must construct |this| before invoking the function.
@@ -225,10 +226,12 @@ jit::EnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, jsbytecode* pc)
     TraceLogStopEvent(logger, TraceLogger_Interpreter);
     TraceLogStartEvent(logger, TraceLogger_Baseline);
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:->EnterBaseline(JSContext*, EnterJitData*)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     JitExecStatus status = EnterBaseline(cx, data);
     if (status != JitExec_Ok)
         return status;
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:->InterpreterFrame::setReturnValue()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     fp->setReturnValue(data.result);
     return JitExec_Ok;
 }
@@ -338,7 +341,6 @@ jit::CanEnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, bool newType)
 MethodStatus
 jit::CanEnterBaselineMethod(JSContext* cx, RunState& state)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (state.isInvoke()) {
         InvokeState& invoke = *state.asInvoke();
         if (invoke.args().length() > BASELINE_MAX_ARGS_LENGTH) {
@@ -353,6 +355,7 @@ jit::CanEnterBaselineMethod(JSContext* cx, RunState& state)
     }
 
     RootedScript script(cx, state.script());
+    YPHPRINTF("thread_%ld:%s:%d:%s:->CanEnterBaselineJIT()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return CanEnterBaselineJIT(cx, script, /* osrFrame = */ nullptr);
 };
 

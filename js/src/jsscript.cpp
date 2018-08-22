@@ -2688,8 +2688,8 @@ ScriptDataSize(uint32_t nscopes, uint32_t nconsts, uint32_t nobjects,
 void
 JSScript::initCompartment(JSContext* cx)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:bind to the JSCompartment of a JSContext instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     compartment_ = cx->compartment();
+    YPHPRINTF("thread_%ld:%s:%d:%s:bind to the JSCompartment @%p of a JSContext instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, compartment_);
 }
 
 /* static */ JSScript*
@@ -2705,7 +2705,6 @@ JSScript::Create(JSContext* cx, const ReadOnlyCompileOptions& options,
     MOZ_ASSERT(toStringStart <= bufStart);
     MOZ_ASSERT(toStringEnd >= bufEnd);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create JSScript && invoke JSScript::initCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
 
     RootedScript script(cx, Allocate<JSScript>(cx));
     if (!script)
@@ -2713,6 +2712,7 @@ JSScript::Create(JSContext* cx, const ReadOnlyCompileOptions& options,
 
     PodZero(script.get());
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JSScript @%p && invoke JSScript::initCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, script.get());
     script->initCompartment(cx);
 
 #ifndef JS_CODEGEN_NONE

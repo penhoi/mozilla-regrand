@@ -213,7 +213,17 @@ class RunState
     explicit RunState(JSContext* cx, Kind kind, JSScript* script)
       : kind_(kind),
         script_(cx, script)
-    { }
+    {
+      const char *s;
+      if (kind_ == Execute)
+        s = "Execute";
+      else if (kind_ == Invoke)
+        s = "Invoke";
+      else
+        s = "unknow";
+
+      YPHPRINTF("thread_%ld:%s:%d:%s:state %s: RunState contains all info contructing interpreter or JIT frame\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, s);
+    }
 
   public:
     bool isExecute() const { return kind_ == Execute; }

@@ -8729,7 +8729,7 @@ BytecodeEmitter::emitStatementList(ParseNode* pn)
 {
     MOZ_ASSERT(pn->isArity(PN_LIST));
     for (ParseNode* pn2 = pn->pn_head; pn2; pn2 = pn2->pn_next) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->emitTree()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        // YPHPRINTF("thread_%ld:%s:%d:%s:->emitTree()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!emitTree(pn2))
             return false;
     }

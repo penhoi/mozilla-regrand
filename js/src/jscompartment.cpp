@@ -95,7 +95,7 @@ JSCompartment::JSCompartment(Zone* zone, const JS::CompartmentOptions& options =
     iterResultTemplate_(nullptr),
     lcovOutput()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:constructor this@%p\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
     PodArrayZero(sawDeprecatedLanguageExtension);
     runtime_->numCompartments++;
     MOZ_ASSERT_IF(creationOptions_.mergeable(),

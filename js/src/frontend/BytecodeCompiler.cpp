@@ -575,16 +575,20 @@ frontend::CompileGlobalScript(JSContext* cx, LifoAlloc& alloc, ScopeKind scopeKi
                               SourceBufferHolder& srcBuf,
                               ScriptSourceObject** sourceObjectOut)
 {
-    char *wbuf = (char*)srcBuf.get();
-    int len = srcBuf.length();
-    char* code = (char*)malloc(len+8);
-    int i;
-    for (i = 0; i< len; i++)
-        code[i] = wbuf[i*2];
-    for (i = len; i > 0 && code[i] != ';' && code[i] != '}'; i--);
-    code[i+1] = '\0';
-    YPHPRINTF("thread_%ld:%s:%d:%s:create BytecodeCompiler && invoke BytecodeCompiler::compileGlobalScript() on \n%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, code);
-    free(code);
+    static int tick = 0;    //skip printing out self-hosted code
+    if (tick > 0) {
+        char *wbuf = (char*)srcBuf.get();
+        int len = srcBuf.length();
+        char* code = (char*)malloc(len+8);
+        int i;
+        for (i = 0; i< len; i++)
+            code[i] = wbuf[i*2];
+        for (i = len; i > 0 && code[i] != ';' && code[i] != '}'; i--);
+        code[i+1] = '\0';
+        YPHPRINTF("thread_%ld:%s:%d:%s:create BytecodeCompiler && invoke BytecodeCompiler::compileGlobalScript() on \n%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, code);
+        free(code);
+    }
+    tick++;
     MOZ_ASSERT(scopeKind == ScopeKind::Global || scopeKind == ScopeKind::NonSyntactic);
     BytecodeCompiler compiler(cx, alloc, options, srcBuf, /* enclosingScope = */ nullptr);
     AutoInitializeSourceObject autoSSO(compiler, sourceObjectOut);
