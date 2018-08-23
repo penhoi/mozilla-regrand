@@ -521,12 +521,14 @@ InternalCall(JSContext* cx, const AnyInvokeArgs& args)
         }
     }
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:->InternalCallOrConstruct()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return InternalCallOrConstruct(cx, args, NO_CONSTRUCT);
 }
 
 bool
 js::CallFromStack(JSContext* cx, const CallArgs& args)
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s:->InternalCall()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return InternalCall(cx, static_cast<const AnyInvokeArgs&>(args));
 }
 
@@ -3112,9 +3114,11 @@ CASE(JSOP_FUNCALL)
                 ReportValueError(cx, JSMSG_NOT_ITERABLE, -1, args.thisv(), nullptr);
                 goto error;
             }
+            YPHPRINTF("thread_%ld:%s:%d:%s:->CallFromStack()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             if (!CallFromStack(cx, args))
                 goto error;
         }
+        YPHPRINTF("thread_%ld:%s:%d:%s:jump to JSOP_CALL_LENGTH\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         Value* newsp = args.spAfterCall();
         TypeScript::Monitor(cx, script, REGS.pc, newsp[-1]);
         REGS.sp = newsp;
@@ -3139,8 +3143,8 @@ CASE(JSOP_FUNCALL)
         TypeMonitorCall(cx, args, construct);
 
         {
+            YPHPRINTF("thread_%ld:%s:%d:%s:create InvokeState && ->jit::MaybeEnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             InvokeState state(cx, args, construct);
-            YPHPRINTF("thread_%ld:%s:%d:%s:->jit::MaybeEnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             jit::EnterJitStatus status = jit::MaybeEnterJit(cx, state);
             switch (status) {
               case jit::EnterJitStatus::Error:
@@ -3172,6 +3176,8 @@ CASE(JSOP_FUNCALL)
     if (!REGS.fp()->prologue(cx))
         goto prologue_error;
 
+
+    YPHPRINTF("thread_%ld:%s:%d:%s:->Debugger::onEnterFrame()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     switch (Debugger::onEnterFrame(cx, REGS.fp())) {
       case JSTRAP_CONTINUE:
         break;
@@ -3190,6 +3196,7 @@ CASE(JSOP_FUNCALL)
     INIT_COVERAGE();
     COUNT_COVERAGE_MAIN();
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:ADVANCE_AND_DISPATCH(0)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     /* Load first op and dispatch it (safe since JSOP_RETRVAL). */
     ADVANCE_AND_DISPATCH(0);
 }

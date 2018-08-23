@@ -43,6 +43,7 @@ Linker::newCode(JSContext* cx, CodeKind kind, bool hasPatchableBackedges /* = fa
     uint8_t* codeStart = result + sizeof(JitCode*);
 
     // Bump the code up to a nice alignment.
+    YPHPRINTF("thread_%ld:%s:%d:%s:create JitCode instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     codeStart = (uint8_t*)AlignBytes((uintptr_t)codeStart, CodeAlignment);
     uint32_t headerSize = codeStart - result;
     JitCode* code = JitCode::New<allowGC>(cx, codeStart, bytesNeeded - headerSize,

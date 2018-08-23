@@ -2560,6 +2560,7 @@ public:
     MOZ_MUST_USE JmpSrc
     call()
     {
+        YPHPRINTF("thread_%ld:%s:%d:%s:X86InstructionFormatter issues call OP_CALL_rel32)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         m_formatter.oneByteOp(OP_CALL_rel32);
         JmpSrc r = m_formatter.immediateRel32();
         spew("call       .Lfrom%d", r.offset());
@@ -2568,12 +2569,14 @@ public:
 
     void call_r(RegisterID dst)
     {
+        YPHPRINTF("thread_%ld:%s:%d:%s:X86InstructionFormatter issues call *reg)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         m_formatter.oneByteOp(OP_GROUP5_Ev, dst, GROUP5_OP_CALLN);
         spew("call       *%s", GPRegName(dst));
     }
 
     void call_m(int32_t offset, RegisterID base)
     {
+        YPHPRINTF("thread_%ld:%s:%d:%s:X86InstructionFormatter issues call *[mem]\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         spew("call       *" MEM_ob, ADDR_ob(offset, base));
         m_formatter.oneByteOp(OP_GROUP5_Ev, offset, base, GROUP5_OP_CALLN);
     }

@@ -69,6 +69,10 @@
 #include "mozilla/TypeTraits.h"
 
 #include "jstypes.h"
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
 
 #include "js/RootingAPI.h"
 #include "js/Value.h"
@@ -151,6 +155,7 @@ class MOZ_STACK_CLASS CallArgsBase
      * rval() has been used!
      */
     HandleValue calleev() const {
+        YPHPRINTF("thread_%ld:%s:%d:%s:Returns the function being called, as a value.\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         this->assertUnusedRval();
         return HandleValue::fromMarkedLocation(&argv_[-2]);
     }
@@ -160,6 +165,7 @@ class MOZ_STACK_CLASS CallArgsBase
      * after rval() has been used!
      */
     JSObject& callee() const {
+        YPHPRINTF("thread_%ld:%s:%d:%s:Returns the function being called, as an object\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         return calleev().toObject();
     }
 

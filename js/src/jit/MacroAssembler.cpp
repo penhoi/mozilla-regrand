@@ -22,6 +22,7 @@
 #include "jit/MIR.h"
 #include "js/Conversions.h"
 #include "vm/TraceLogging.h"
+#include "mozilla/Assertions.h"
 
 #include "jsobjinlines.h"
 
@@ -2388,6 +2389,7 @@ MacroAssembler::AutoProfilerCallInstrumentation::AutoProfilerCallInstrumentation
 void
 MacroAssembler::linkProfilerCallSites(JitCode* code)
 {
+    ::YPHPRINTF("thread_%ld:%s:%d:%s:->PatchDataWithValueCheck()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     for (size_t i = 0; i < profilerCallSites_.length(); i++) {
         CodeOffset offset = profilerCallSites_[i];
         CodeLocationLabel location(code, offset);

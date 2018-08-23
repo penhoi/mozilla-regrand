@@ -301,6 +301,7 @@ CanEnterBaselineJIT(JSContext* cx, HandleScript script, InterpreterFrame* osrFra
     // Frames can be marked as debuggee frames independently of its underlying
     // script being a debuggee script, e.g., when performing
     // Debugger.Frame.prototype.eval.
+    YPHPRINTF("thread_%ld:%s:%d:%s:->BaselineCompile()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return BaselineCompile(cx, script, osrFrame && osrFrame->isDebuggee());
 }
 
