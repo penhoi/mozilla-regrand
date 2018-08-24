@@ -1032,7 +1032,7 @@ BaselineCompiler::emitBody()
 
 #define EMIT_OP(OP)                            \
           case OP:                             \
-            YPHPRINTF("thread_%ld:%s:%d:%s:this->%s()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, "emit" #op); \
+            YPHPRINTF("thread_%ld:%s:%d:%s:this->%s()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, "emit" #OP); \
             if (MOZ_UNLIKELY(!this->emit_##OP())) \
                 return Method_Error;           \
             break;
@@ -3405,9 +3405,11 @@ BaselineCompiler::emitCall()
     bool construct = JSOp(*pc) == JSOP_NEW || JSOp(*pc) == JSOP_SUPERCALL;
     uint32_t argc = GET_ARGC(pc);
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:->MacroAssembler::move32() to add MOV inst\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     frame.syncStack(0);
     masm.move32(Imm32(argc), R0.scratchReg());
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:self->emitOpIC() to generate stub\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     // Call IC
     ICCall_Fallback::Compiler stubCompiler(cx, /* isConstructing = */ construct,
                                            /* isSpread = */ false);
@@ -3415,6 +3417,7 @@ BaselineCompiler::emitCall()
         return false;
 
     // Update FrameInfo.
+    YPHPRINTF("thread_%ld:%s:%d:%s:Update FrameInfo inherited from BaselineCompilerShared\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     frame.popn(2 + argc + construct);
     frame.push(R0);
     return true;

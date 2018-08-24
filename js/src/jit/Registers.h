@@ -38,7 +38,8 @@ struct Register {
     Encoding reg_;
     explicit constexpr Register(Encoding e)
      : reg_(e)
-    { }
+    {}
+
     Register() = default;
 
     static Register FromCode(Code i) {

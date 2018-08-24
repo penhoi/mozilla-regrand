@@ -65,8 +65,10 @@ static const uint32_t JumpImmediateRange = INT32_MAX;
 
 class Registers {
   public:
+    Registers()
+    {   YPHPRINTF("thread_%ld:%s:%d:%s:defines the register set of x86 arch\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__); }
     typedef uint8_t Code;
-    typedef X86Encoding::RegisterID Encoding;
+    typedef X86Encoding::RegisterID Encoding;   //Name space X86Encoding, enum RegisterID
 
     // Content spilled during bailouts.
     union RegisterContent {
@@ -202,7 +204,7 @@ typedef Registers::SetType PackedRegisterMask;
 
 class FloatRegisters {
   public:
-    typedef X86Encoding::XMMRegisterID Encoding;
+    typedef X86Encoding::XMMRegisterID Encoding;    //Name space X86Encoding, enum XMMRegisterID
 
     enum ContentType {
         Single,     // 32-bit float.
