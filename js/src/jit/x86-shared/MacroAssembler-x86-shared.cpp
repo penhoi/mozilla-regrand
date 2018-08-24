@@ -635,18 +635,21 @@ MacroAssembler::call(wasm::SymbolicAddress target)
 void
 MacroAssembler::call(ImmWord target)
 {
+    ::YPHPRINTF("thread_%ld:%s:%d:%s:->Assembler::call()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     Assembler::call(target);
 }
 
 void
 MacroAssembler::call(ImmPtr target)
 {
+    ::YPHPRINTF("thread_%ld:%s:%d:%s:->Assembler::call()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     Assembler::call(target);
 }
 
 void
 MacroAssembler::call(JitCode* target)
 {
+    ::YPHPRINTF("thread_%ld:%s:%d:%s:->Assembler::call()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     Assembler::call(target);
 }
 

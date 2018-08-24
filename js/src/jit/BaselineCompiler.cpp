@@ -1032,6 +1032,7 @@ BaselineCompiler::emitBody()
 
 #define EMIT_OP(OP)                            \
           case OP:                             \
+            YPHPRINTF("thread_%ld:%s:%d:%s:this->%s()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, "emit" #op); \
             if (MOZ_UNLIKELY(!this->emit_##OP())) \
                 return Method_Error;           \
             break;

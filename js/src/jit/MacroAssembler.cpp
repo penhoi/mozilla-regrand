@@ -2826,7 +2826,7 @@ MacroAssembler::callWithABINoProfiler(void* fun, MoveOp::Type result, CheckUnsaf
         pop(ReturnReg);
     }
 #endif
-
+    ::YPHPRINTF("thread_%ld:%s:%d:%s:self->call(ImmPtr(fun))\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     call(ImmPtr(fun));
 
     callWithABIPost(stackAdjust, result);

@@ -226,6 +226,7 @@ JitRuntime::~JitRuntime()
 uint32_t
 JitRuntime::startTrampolineCode(MacroAssembler& masm)
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s:MacroAssembler->assumeUnreachable() & ..-> setFramePushed()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     masm.assumeUnreachable("Shouldn't get here");
     masm.flushBuffer();
     masm.haltingAlign(CodeAlignment);
