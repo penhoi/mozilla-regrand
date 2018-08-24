@@ -34,6 +34,7 @@ static const LiveRegisterSet AllRegs =
 void
 JitRuntime::generateEnterJIT(JSContext* cx, MacroAssembler& masm)
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s User standard x64 fastcall convention\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     enterJITOffset_ = startTrampolineCode(masm);
 
     masm.assertStackAlignment(ABIStackAlignment, -int32_t(sizeof(uintptr_t)) /* return address */);
@@ -602,6 +603,7 @@ JitRuntime::generateBailoutHandler(MacroAssembler& masm, Label* bailoutTail)
 bool
 JitRuntime::generateVMWrapper(JSContext* cx, MacroAssembler& masm, const VMFunction& f)
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s:call wrapper function abiding ABI convention\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     MOZ_ASSERT(functionWrappers_);
     MOZ_ASSERT(functionWrappers_->initialized());
 
