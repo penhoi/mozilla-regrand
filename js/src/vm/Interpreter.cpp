@@ -1954,8 +1954,8 @@ Interpret(JSContext* cx, RunState& state)
     COUNT_COVERAGE_MAIN();
 
     // Enter the interpreter loop starting at the current pc.
-    DumpPC(cx);
     YPHPRINTF("thread_%ld:%s:%d:%s:Enter the interpreter loop\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    DumpPC(cx);
     ADVANCE_AND_DISPATCH(0);
 
 
@@ -2066,8 +2066,10 @@ CASE(JSOP_LOOPENTRY)
 
             jit::JitExecStatus maybeOsr;
             {
+                YPHPRINTF("thread_%ld:%s:%d:%s:maybeOsr before->jit::EnterBaselineAtBranch()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
                 GeckoProfilerBaselineOSRMarker osr(cx, wasProfiler);
                 maybeOsr = jit::EnterBaselineAtBranch(cx, REGS.fp(), REGS.pc);
+                YPHPRINTF("thread_%ld:%s:%d:%s:maybeOsr after->jit::EnterBaselineAtBranch()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             }
 
             // We failed to call into baseline at all, so treat as an error.
@@ -2144,6 +2146,7 @@ END_CASE(JSOP_LEAVEWITH)
 CASE(JSOP_RETURN)
     POP_RETURN_VALUE();
     /* FALL THROUGH */
+    YPHPRINTF("thread_%ld:%s:%d:%s:case(JSOP_RETURN) fall through to case(JSOP_RETRVAL)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
 
 CASE(JSOP_RETRVAL)
 {
@@ -2174,7 +2177,7 @@ CASE(JSOP_RETRVAL)
         }
 
   jit_return_pop_frame:
-
+        YPHPRINTF("thread_%ld:%s:%d:%s:label jit_return_pop_frame: ->Activation::popInlineFrame() \n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         activation.popInlineFrame(REGS.fp());
         SET_SCRIPT(REGS.fp()->script());
 
@@ -2185,7 +2188,7 @@ CASE(JSOP_RETRVAL)
         /* Resume execution in the calling frame. */
         if (MOZ_LIKELY(interpReturnOK)) {
             TypeScript::Monitor(cx, script, REGS.pc, REGS.sp[-1]);
-
+            YPHPRINTF("thread_%ld:%s:%d:%s:label jit_return: Resume execution in the calling frame \n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
             ADVANCE_AND_DISPATCH(JSOP_CALL_LENGTH);
         }
 
@@ -3177,7 +3180,6 @@ CASE(JSOP_FUNCALL)
         goto prologue_error;
 
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->Debugger::onEnterFrame()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     switch (Debugger::onEnterFrame(cx, REGS.fp())) {
       case JSTRAP_CONTINUE:
         break;
@@ -3196,7 +3198,8 @@ CASE(JSOP_FUNCALL)
     INIT_COVERAGE();
     COUNT_COVERAGE_MAIN();
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:ADVANCE_AND_DISPATCH(0)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINTF("thread_%ld:%s:%d:%s:call to interpreter loop\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    DumpPC(cx);
     /* Load first op and dispatch it (safe since JSOP_RETRVAL). */
     ADVANCE_AND_DISPATCH(0);
 }

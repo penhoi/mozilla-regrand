@@ -187,7 +187,7 @@ ReserveProcessExecutableMemory(size_t bytes)
 # endif
 
     void* p = nullptr;
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; false && i < 10; i++) {
         void* randomAddr = ComputeRandomAllocationAddress();
         p = VirtualAlloc(randomAddr, bytes, MEM_RESERVE, PAGE_NOACCESS);
         if (p)
@@ -200,6 +200,8 @@ ReserveProcessExecutableMemory(size_t bytes)
         if (!p)
             return nullptr;
     }
+    YPHPRINTF("thread_%ld:%s:%d:%s:Windows reserve %lx bytes @%p, we disable randomization\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, bytes, p);
+
 
 # ifdef HAVE_64BIT_BUILD
     if (sJitExceptionHandler) {
@@ -288,11 +290,13 @@ ReserveProcessExecutableMemory(size_t bytes)
 {
     // Note that randomAddr is just a hint: if the address is not available
     // mmap will pick a different address.
-    void* randomAddr = ComputeRandomAllocationAddress();
+    // void* randomAddr = ComputeRandomAllocationAddress();
+    void* randomAddr = (void*)0x60000000;
     void* p = MozTaggedAnonymousMmap(randomAddr, bytes, PROT_NONE, MAP_PRIVATE | MAP_ANON,
                                      -1, 0, "js-executable-memory");
     if (p == MAP_FAILED)
         return nullptr;
+    YPHPRINTF("thread_%ld:%s:%d:%s:Linux reserve %lx bytes @%p, we disable randomization\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, bytes, p);
     return p;
 }
 
@@ -449,7 +453,9 @@ class ProcessExecutableMemory
         cursor_(0),
         rng_(),
         pages_()
-    {}
+    {
+        YPHPRINTF("thread_%ld:%s:%d:%s:reserves memory for code cache\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    }
 
     MOZ_MUST_USE bool init() {
         pages_.init();
@@ -610,6 +616,7 @@ js::jit::DeallocateExecutableMemory(void* addr, size_t bytes)
 bool
 js::jit::InitProcessExecutableMemory()
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s:->ProcessExecutableMemory::init()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     return execMemory.init();
 }
 

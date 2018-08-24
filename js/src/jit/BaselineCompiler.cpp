@@ -47,6 +47,7 @@ BaselineCompiler::BaselineCompiler(JSContext* cx, TempAllocator& alloc, JSScript
     yieldAndAwaitOffsets_(cx),
     modifiesArguments_(false)
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s:constuctor @%p \ninherited from BaselineCompilerX64 in turn from BaselineCompilerShared\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
 }
 
 bool

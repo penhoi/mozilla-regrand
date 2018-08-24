@@ -2555,7 +2555,7 @@ DoCallFallback(JSContext* cx, BaselineFrame* frame, ICCall_Fallback* stub_, uint
             ReportValueError(cx, JSMSG_NOT_ITERABLE, -1, callArgs.thisv(), nullptr);
             return false;
         }
-
+        YPHPRINTF("thread_%ld:%s:%d:%s:->CallFromStack()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
         if (!CallFromStack(cx, callArgs))
             return false;
 

@@ -287,6 +287,8 @@ class AssemblerX86Shared : public AssemblerShared
     {
         if (!HasAVX())
             masm.disableVEX();
+
+        YPHPRINTF("thread_%ld:%s:%d:%s:constructor @%p, \nhas member *masm* instance of X86Encoding::BaseAssemblerSpecific\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
     }
 
     enum Condition {

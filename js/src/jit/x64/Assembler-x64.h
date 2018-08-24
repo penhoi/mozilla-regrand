@@ -313,7 +313,7 @@ class Assembler : public AssemblerX86Shared
     Assembler()
       : extendedJumpTable_(0)
     {
-        YPHPRINTF("thread_%ld:%s:%d:%s:constructor create X64 Assembler @%p, \ndefines x64 registers \nhas X86Encoding::BaseAssemblerSpecific inherited from AssemblerX86Shared\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+        YPHPRINTF("thread_%ld:%s:%d:%s:constructor create X64 Assembler @%p, \nThis file defines x64 registers\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
     }
 
     static void TraceJumpRelocations(JSTracer* trc, JitCode* code, CompactBufferReader& reader);

@@ -38,7 +38,9 @@ BaselineCompilerShared::BaselineCompilerShared(JSContext* cx, TempAllocator& all
     profilerExitFrameToggleOffset_(),
     traceLoggerToggleOffsets_(cx),
     traceLoggerScriptTextIdOffset_()
-{ }
+{
+    YPHPRINTF("thread_%ld:%s:%d:%s:constuctor @%p \n has member *masm* instance of MacroAssembler\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+}
 
 void
 BaselineCompilerShared::prepareVMCall()

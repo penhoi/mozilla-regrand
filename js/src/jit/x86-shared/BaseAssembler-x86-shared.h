@@ -49,7 +49,9 @@ class BaseAssembler : public GenericAssembler {
 public:
     BaseAssembler()
       : useVEX_(true)
-    { }
+    {
+        YPHPRINTF("thread_%ld:%s:%d:%s:constructor @%p, \nhas member m_formatter instance of self::X86InstructionFormatter\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+    }
 
     void disableVEX() { useVEX_ = false; }
 
