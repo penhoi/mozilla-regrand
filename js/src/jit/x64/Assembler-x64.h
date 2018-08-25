@@ -313,7 +313,7 @@ class Assembler : public AssemblerX86Shared
     Assembler()
       : extendedJumpTable_(0)
     {
-        YPHPRINTF("thread_%ld:%s:%d:%s:constructor create X64 Assembler @%p, \nThis file defines x64 registers\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+        YPHPRINT("constructor create X64 Assembler @%p, \nThis file defines x64 registers", (void*)this);
     }
 
     static void TraceJumpRelocations(JSTracer* trc, JitCode* code, CompactBufferReader& reader);
@@ -1074,7 +1074,7 @@ class Assembler : public AssemblerX86Shared
         j(cond, ImmPtr(target->raw()), Relocation::JITCODE);
     }
     void call(JitCode* target) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->X86Encoding::BaseAssemblerSpecific::call(Relocation::JITCODE)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->X86Encoding::BaseAssemblerSpecific::call(Relocation::JITCODE)");
         JmpSrc src = masm.call();
         addPendingJump(src, ImmPtr(target->raw()), Relocation::JITCODE);
     }
@@ -1082,7 +1082,7 @@ class Assembler : public AssemblerX86Shared
         call(ImmPtr((void*)target.value));
     }
     void call(ImmPtr target) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->X86Encoding::BaseAssemblerSpecific::call(Relocation::HARDCODED)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->X86Encoding::BaseAssemblerSpecific::call(Relocation::HARDCODED)");
         JmpSrc src = masm.call();
         addPendingJump(src, target, Relocation::HARDCODED);
     }

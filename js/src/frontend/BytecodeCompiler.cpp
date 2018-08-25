@@ -316,7 +316,7 @@ BytecodeCompiler::deoptimizeArgumentsInEnclosingScripts(JSContext* cx, HandleObj
 JSScript*
 BytecodeCompiler::compileScript(HandleObject environment, SharedContext* sc)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke createSourceAndParser() && createScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke createSourceAndParser() && createScript()");
     if (!createSourceAndParser())
         return nullptr;
 
@@ -328,7 +328,7 @@ BytecodeCompiler::compileScript(HandleObject environment, SharedContext* sc)
         return nullptr;
 
     for (;;) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:get ParseNode\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("get ParseNode");
         ParseNode* pn;
         if (sc->isEvalContext())
             pn = parser->evalBody(sc->asEvalContext());
@@ -345,7 +345,7 @@ BytecodeCompiler::compileScript(HandleObject environment, SharedContext* sc)
                 if (!deoptimizeArgumentsInEnclosingScripts(cx, environment))
                     return nullptr;
             }
-            YPHPRINTF("thread_%ld:%s:%d:%s:invoke BytecodeEmitter::emitScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("invoke BytecodeEmitter::emitScript()");
             if (!emitter->emitScript(pn))
                 return nullptr;
             if (!NameFunctions(cx, pn))
@@ -585,7 +585,7 @@ frontend::CompileGlobalScript(JSContext* cx, LifoAlloc& alloc, ScopeKind scopeKi
             code[i] = wbuf[i*2];
         for (i = len; i > 0 && code[i] != ';' && code[i] != '}'; i--);
         code[i+1] = '\0';
-        YPHPRINTF("thread_%ld:%s:%d:%s:create BytecodeCompiler && invoke BytecodeCompiler::compileGlobalScript() on \n%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, code);
+        YPHPRINT("create BytecodeCompiler && invoke BytecodeCompiler::compileGlobalScript() on %s", code);
         free(code);
     }
     tick++;
@@ -610,7 +610,7 @@ frontend::CompileEvalScript(JSContext* cx, LifoAlloc& alloc,
         code[i] = wbuf[i*2];
     for (i = len; i > 0 && code[i] != ';' && code[i] != '}'; i--);
     code[i+1] = '\0';
-    YPHPRINTF("thread_%ld:%s:%d:%s:create BytecodeCompiler && invoke BytecodeCompiler::compileEvalScript() on \n%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, code);
+    YPHPRINT("create BytecodeCompiler && invoke BytecodeCompiler::compileEvalScript() on \n%s", code);
     free(code);
     BytecodeCompiler compiler(cx, alloc, options, srcBuf, enclosingScope);
     AutoInitializeSourceObject autoSSO(compiler, sourceObjectOut);

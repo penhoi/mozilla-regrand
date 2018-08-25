@@ -173,7 +173,7 @@ BaselineCacheIRCompiler::compile()
         switch (reader.readOp()) {
 #define DEFINE_OP(op)                   \
           case CacheOp::op:             \
-            YPHPRINTF("thread_%ld:%s:%d:%s:->%s()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, "emit" #op); \
+            YPHPRINT("->%s()", "emit" #op); \
             if (!emit##op())            \
                 return nullptr;         \
             break;
@@ -197,7 +197,7 @@ BaselineCacheIRCompiler::compile()
         EmitStubGuardFailure(masm);
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create linker for BASELINE_CODE JitCode\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create linker for BASELINE_CODE JitCode");
     Linker linker(masm);
     AutoFlushICache afc("getStubCode");
     Rooted<JitCode*> newStubCode(cx_, linker.newCode<NoGC>(cx_, BASELINE_CODE));

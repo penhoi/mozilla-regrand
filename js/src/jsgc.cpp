@@ -968,7 +968,7 @@ GCRuntime::GCRuntime(JSRuntime* rt) :
     storeBuffer_(rt, nursery()),
     blocksToFreeAfterMinorGC((size_t) JSContext::TEMP_LIFO_ALLOC_PRIMARY_CHUNK_SIZE)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("constructor");
     setGCMode(JSGC_MODE_GLOBAL);
 }
 
@@ -1170,7 +1170,7 @@ static const uint64_t JIT_SCRIPT_RELEASE_TYPES_PERIOD = 20;
 bool
 GCRuntime::init(uint32_t maxbytes, uint32_t maxNurseryBytes)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:->InitTrace() && ->initSweepActions() etc\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->InitTrace() && ->initSweepActions() etc");
     MOZ_ASSERT(SystemPageSize());
 
     if (!rootsHash.ref().init(256))
@@ -7863,7 +7863,7 @@ js::NewCompartment(JSContext* cx, JSPrincipals* principals,
         }
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create JSCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create JSCompartment");
     ScopedJSDeletePtr<JSCompartment> compartment(cx->new_<JSCompartment>(zone, options));
     if (!compartment || !compartment->init(cx))
         return nullptr;

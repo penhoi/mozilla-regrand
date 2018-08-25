@@ -288,7 +288,7 @@ class AssemblerX86Shared : public AssemblerShared
         if (!HasAVX())
             masm.disableVEX();
 
-        YPHPRINTF("thread_%ld:%s:%d:%s:constructor @%p, \nhas member *masm* instance of X86Encoding::BaseAssemblerSpecific\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+        YPHPRINT("constructor @%p, \nhas member *masm* instance of X86Encoding::BaseAssemblerSpecific", (void*)this);
     }
 
     enum Condition {
@@ -1029,7 +1029,7 @@ class AssemblerX86Shared : public AssemblerShared
         masm.ret_i(n.value - sizeof(void*));
     }
     CodeOffset call(Label* label) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->X86Encoding::BaseAssemblerSpecific::call()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->X86Encoding::BaseAssemblerSpecific::call()");
         JmpSrc j = masm.call();
         if (label->bound()) {
             masm.linkJump(j, JmpDst(label->offset()));
@@ -1043,12 +1043,12 @@ class AssemblerX86Shared : public AssemblerShared
         return CodeOffset(masm.currentOffset());
     }
     CodeOffset call(Register reg) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->X86Encoding::BaseAssemblerSpecific::call_r(reg.encoding())\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->X86Encoding::BaseAssemblerSpecific::call_r(reg.encoding())");
         masm.call_r(reg.encoding());
         return CodeOffset(masm.currentOffset());
     }
     void call(const Operand& op) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->X86Encoding::BaseAssemblerSpecific::call_r() or .. call_m()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->X86Encoding::BaseAssemblerSpecific::call_r() or .. call_m()");
         switch (op.kind()) {
           case Operand::REG:
             masm.call_r(op.reg());

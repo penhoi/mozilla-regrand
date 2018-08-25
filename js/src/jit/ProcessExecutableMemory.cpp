@@ -200,7 +200,7 @@ ReserveProcessExecutableMemory(size_t bytes)
         if (!p)
             return nullptr;
     }
-    YPHPRINTF("thread_%ld:%s:%d:%s:Windows reserve %lx bytes @%p, we disable randomization\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, bytes, p);
+    YPHPRINT("Windows reserve %lx bytes @%p, we disable randomization", bytes, p);
 
 
 # ifdef HAVE_64BIT_BUILD
@@ -296,7 +296,7 @@ ReserveProcessExecutableMemory(size_t bytes)
                                      -1, 0, "js-executable-memory");
     if (p == MAP_FAILED)
         return nullptr;
-    YPHPRINTF("thread_%ld:%s:%d:%s:Linux reserve %lx bytes @%p, we disable randomization\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, bytes, p);
+    YPHPRINT("Linux reserve %lx bytes @%p, we disable randomization", bytes, p);
     return p;
 }
 
@@ -454,7 +454,7 @@ class ProcessExecutableMemory
         rng_(),
         pages_()
     {
-        YPHPRINTF("thread_%ld:%s:%d:%s:reserves memory for code cache\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("reserves memory for code cache");
     }
 
     MOZ_MUST_USE bool init() {
@@ -616,7 +616,7 @@ js::jit::DeallocateExecutableMemory(void* addr, size_t bytes)
 bool
 js::jit::InitProcessExecutableMemory()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:->ProcessExecutableMemory::init()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->ProcessExecutableMemory::init()");
     return execMemory.init();
 }
 

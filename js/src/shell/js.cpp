@@ -698,7 +698,7 @@ RunFile(JSContext* cx, const char* filename, FILE* file, bool compileOnly)
     ungetc(ch, file);
 
     int64_t t1 = PRMJ_Now();
-    YPHPRINTF("thread_%ld:%s:%d:%s:create RootedScript\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create RootedScript");
     RootedScript script(cx);
 
     {
@@ -709,7 +709,7 @@ RunFile(JSContext* cx, const char* filename, FILE* file, bool compileOnly)
                .setIsRunOnce(true)
                .setNoScriptRval(true);
 
-        YPHPRINTF("thread_%ld:%s:%d:%s:invoke JS::Compile\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("invoke JS::Compile");
         if (!JS::Compile(cx, options, file, &script))
             return false;
         MOZ_ASSERT(script);
@@ -720,7 +720,7 @@ RunFile(JSContext* cx, const char* filename, FILE* file, bool compileOnly)
             AnalyzeEntrainedVariables(cx, script);
     #endif
     if (!compileOnly) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:invoke JS_ExecuteScript\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("invoke JS_ExecuteScript");
         if (!JS_ExecuteScript(cx, script))
             return false;
         int64_t t2 = PRMJ_Now() - t1;
@@ -1073,11 +1073,11 @@ Process(JSContext* cx, const char* filename, bool forceTTY, FileKind kind = File
     if (!forceTTY && !isatty(fileno(file))) {
         // It's not interactive - just execute it.
         if (kind == FileScript) {
-            YPHPRINTF("thread_%ld:%s:%d:%s:invoke RunFile\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("invoke RunFile");
             if (!RunFile(cx, filename, file, compileOnly))
                 return false;
         } else {
-            YPHPRINTF("thread_%ld:%s:%d:%s:invoke RunMoudle\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("invoke RunMoudle");
             if (!RunModule(cx, filename, file, compileOnly))
                 return false;
         }
@@ -3580,7 +3580,7 @@ static bool ShellBuildId(JS::BuildIdCharVector* buildId);
 static void
 WorkerMain(void* arg)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:stat WorkerMain\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("stat WorkerMain");
     WorkerInput* input = (WorkerInput*) arg;
     MOZ_ASSERT(!!input->parentRuntime != !!input->siblingContext);
 
@@ -8142,7 +8142,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
         JS::ContextOptionsRef(cx).toggleExtraWarnings();
 
     /* |scriptArgs| gets bound on the global before any code is run. */
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke BindScriptArgs before run any code\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke BindScriptArgs before run any code");
     if (!BindScriptArgs(cx, op))
         return false;
 
@@ -8155,7 +8155,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
         modulePaths.empty() &&
         !op->getStringArg("script"))
     {
-        YPHPRINTF("thread_%ld:%s:%d:%s:invoke Process\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("invoke Process");
         return Process(cx, nullptr, true); /* Interactive. */
     }
 
@@ -8186,7 +8186,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
 
         if (fpArgno < ccArgno && fpArgno < mpArgno) {
             char* path = filePaths.front();
-            YPHPRINTF("thread_%ld:%s:%d:%s:invoke Process in while case1\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("invoke Process in while case1");
             if (!Process(cx, path, false, FileScript))
                 return false;
             filePaths.popFront();
@@ -8195,7 +8195,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
             RootedValue rval(cx);
             JS::CompileOptions opts(cx);
             opts.setFileAndLine("-e", 1);
-            YPHPRINTF("thread_%ld:%s:%d:%s:invoke JS::Evaluate in while case2\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("invoke JS::Evaluate in while case2");
             if (!JS::Evaluate(cx, opts, code, strlen(code), &rval))
                 return false;
             codeChunks.popFront();
@@ -8204,7 +8204,7 @@ ProcessArgs(JSContext* cx, OptionParser* op)
         } else {
             MOZ_ASSERT(mpArgno < fpArgno && mpArgno < ccArgno);
             char* path = modulePaths.front();
-            YPHPRINTF("thread_%ld:%s:%d:%s:invoke Process in while casedefault\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("invoke Process in while casedefault");
             if (!Process(cx, path, false, FileModule))
                 return false;
             modulePaths.popFront();
@@ -8216,13 +8216,13 @@ ProcessArgs(JSContext* cx, OptionParser* op)
 
     /* The |script| argument is processed after all options. */
     if (const char* path = op->getStringArg("script")) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:invoke Process on arg script\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("invoke Process on arg script");
         if (!Process(cx, path, false))
             return false;
     }
 
     if (op->getBoolOption('i')) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:invoke Process on arg -i-\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("invoke Process on arg -i-");
         if (!Process(cx, nullptr, true))
             return false;
     }
@@ -8581,17 +8581,17 @@ Shell(JSContext* cx, OptionParser* op, char** envp)
     if (!glob)
         return 1;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create JSAutoCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create JSAutoCompartment");
     JSAutoCompartment ac(cx, glob);
 
     ShellContext* sc = GetShellContext(cx);
     int result = EXIT_SUCCESS;
     {
         AutoReportException are(cx);
-        YPHPRINTF("thread_%ld:%s:%d:%s:before invoking ProcessArgs\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("before invoking ProcessArgs");
         if (!ProcessArgs(cx, op) && !sc->quitting)
             result = EXITCODE_RUNTIME_ERROR;
-        YPHPRINTF("thread_%ld:%s:%d:%s:after invoking ProcessArgs\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("after invoking ProcessArgs");
     }
 
     /*
@@ -8600,11 +8600,11 @@ Shell(JSContext* cx, OptionParser* op, char** envp)
      * uncaught exceptions have been reported since draining runs callbacks.
      */
     if (!GetShellContext(cx)->quitting) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:before invoking js::RunJobs\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("before invoking js::RunJobs");
         js::RunJobs(cx);
-        YPHPRINTF("thread_%ld:%s:%d:%s:after invoking js::RunJobs\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("after invoking js::RunJobs");
     }
-    YPHPRINTF("thread_%ld:%s:%d:%s:finish executing script? YES!\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("finish executing script? YES!");
     if (sc->exitCode)
         result = sc->exitCode;
 
@@ -8699,7 +8699,7 @@ class AutoLibraryLoader {
 int
 main(int argc, char** argv, char** envp)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:start js main\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("start js main");
     PreInit();
 
     sArgc = argc;
@@ -8722,13 +8722,13 @@ main(int argc, char** argv, char** envp)
     SetOutputFile("JS_STDERR", &rcStderr, &gErrFile);
 
     // Start the engine.
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke JS_Init to start the engine\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke JS_Init to start the engine");
     if (!JS_Init())
         return 1;
 
     auto shutdownEngine = MakeScopeExit([]() { JS_ShutDown(); });
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create OptionParser for parsing argument\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create OptionParser for parsing argument");
     OptionParser op("Usage: {progname} [options] [[script] scriptArgs*]");
 
     op.setDescription("The SpiderMonkey shell provides a command line interface to the "
@@ -8978,7 +8978,7 @@ main(int argc, char** argv, char** envp)
     nurseryBytes = op.getIntOption("nursery-size") * 1024L * 1024L;
 
     /* Use the same parameters as the browser in xpcjsruntime.cpp. */
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke JS_NewContext to create JSContext\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke JS_NewContext to create JSContext");
     JSContext* cx = JS_NewContext(JS::DefaultHeapMaxBytes, nurseryBytes);
     if (!cx)
         return 1;
@@ -9032,7 +9032,7 @@ main(int argc, char** argv, char** envp)
 
     js::UseInternalJobQueues(cx);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke InitSelfHostedCode to compile self-hosted JS-code\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke InitSelfHostedCode to compile self-hosted JS-code");
     if (!JS::InitSelfHostedCode(cx))
         return 1;
 
@@ -9061,7 +9061,7 @@ main(int argc, char** argv, char** envp)
                                             CooperativeEndSingleThreadedExecution);
     SetCooperativeYieldCallback(cx, CooperativeYieldCallback);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke Shell() to execute script\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke Shell() to execute script");
     result = Shell(cx, &op, envp);
 
 #ifdef DEBUG

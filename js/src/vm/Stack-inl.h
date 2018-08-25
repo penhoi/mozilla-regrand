@@ -950,7 +950,7 @@ InterpreterActivation::InterpreterActivation(RunState& state, JSContext* cx,
   , oldFrameCount_(cx->interpreterStack().frameCount_)
 #endif
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constructor() this@%p && ->InterpreterRegs::prepareToRun()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+    YPHPRINT("constructor() this@%p && ->InterpreterRegs::prepareToRun()", (void*)this);
     regs_.prepareToRun(*entryFrame, state.script());
     MOZ_ASSERT(regs_.pc == state.script()->code());
     MOZ_ASSERT_IF(entryFrame_->isEvalFrame(), state.script()->isActiveEval());

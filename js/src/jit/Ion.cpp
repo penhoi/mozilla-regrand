@@ -226,7 +226,7 @@ JitRuntime::~JitRuntime()
 uint32_t
 JitRuntime::startTrampolineCode(MacroAssembler& masm)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:MacroAssembler->assumeUnreachable() & ..-> setFramePushed()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("MacroAssembler->assumeUnreachable() & ..-> setFramePushed()");
     masm.assumeUnreachable("Shouldn't get here");
     masm.flushBuffer();
     masm.haltingAlign(CodeAlignment);
@@ -248,7 +248,7 @@ JitRuntime::initialize(JSContext* cx, AutoLockForExclusiveAccess& lock)
     if (!functionWrappers_ || !functionWrappers_->init())
         return false;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create stubs including bailoutTail && malloc stub && free stub ...\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create stubs including bailoutTail && malloc stub && free stub ...");
 
     MacroAssembler masm;
 
@@ -753,7 +753,7 @@ JitCode::New(JSContext* cx, uint8_t* code, uint32_t bufferSize, uint32_t headerS
         return nullptr;
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create JitCode instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create JitCode instance");
     new (codeObj) JitCode(code, bufferSize, headerSize, pool, kind);
     return codeObj;
 }
@@ -884,7 +884,7 @@ IonScript::IonScript()
     osrPcMismatchCounter_(0),
     fallbackStubSpace_()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("constructor");
 }
 
 IonScript*
@@ -933,7 +933,7 @@ IonScript::New(JSContext* cx, RecompileInfo recompileInfo,
                    paddedSafepointSize +
                    paddedBackedgeSize +
                    paddedSharedStubSize;
-    YPHPRINTF("thread_%ld:%s:%d:%s:create IonScript with layoutinfo\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create IonScript with layoutinfo");
     IonScript* script = cx->zone()->pod_malloc_with_extra<IonScript, uint8_t>(bytes);
     if (!script)
         return nullptr;
@@ -2527,7 +2527,7 @@ jit::CanEnterIon(JSContext* cx, RunState& state)
     // If --ion-eager is used, compile with Baseline first, so that we
     // can directly enter IonMonkey.
     if (JitOptions.eagerCompilation && !script->hasBaselineScript()) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->jit::CanEnterBaselineMethod()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->jit::CanEnterBaselineMethod()");
         MethodStatus status = CanEnterBaselineMethod(cx, state);
         if (status != Method_Compiled)
             return status;

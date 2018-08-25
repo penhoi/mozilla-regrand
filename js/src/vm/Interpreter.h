@@ -222,7 +222,7 @@ class RunState
       else
         s = "unknow";
 
-      YPHPRINTF("thread_%ld:%s:%d:%s:state %s: RunState contains all info contructing interpreter or JIT frame\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, s);
+      YPHPRINT("state %s: RunState contains all info contructing interpreter or JIT frame", s);
     }
 
   public:

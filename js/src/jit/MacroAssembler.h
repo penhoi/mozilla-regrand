@@ -362,7 +362,7 @@ class MacroAssembler : public MacroAssemblerSpecific
         initWithAllocator();
         armbuffer_.id = jcx->getNextAssemblerId();
 #endif
-        ::YPHPRINTF("thread_%ld:%s:%d:%s:constuctor @%p \ninherited from MacroAssembler-x64 in turn from AssemblerShared\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+        YPHPRINT("constuctor @%p \ninherited from MacroAssembler-x64 in turn from AssemblerShared", (void*)this);
     }
 
     // This constructor should only be used when there is no JitContext active

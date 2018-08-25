@@ -84,7 +84,7 @@ BaselineScript::BaselineScript(uint32_t prologueOffset, uint32_t epilogueOffset,
     pendingBuilder_(nullptr),
     controlFlowGraph_(nullptr)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
 }
 
 static bool
@@ -130,7 +130,7 @@ EnterBaseline(JSContext* cx, EnterJitData& data)
     MOZ_ASSERT(jit::IsBaselineEnabled(cx));
     MOZ_ASSERT(CheckFrame(data.osrFrame));
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create EnterJitCode & ->CALL_GENERATED_CODE\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create EnterJitCode & ->CALL_GENERATED_CODE");
     EnterJitCode enter = cx->runtime()->jitRuntime()->enterJit();
 
     // Caller must construct |this| before invoking the function.
@@ -226,12 +226,12 @@ jit::EnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, jsbytecode* pc)
     TraceLogStopEvent(logger, TraceLogger_Interpreter);
     TraceLogStartEvent(logger, TraceLogger_Baseline);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->EnterBaseline(JSContext*, EnterJitData*)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->EnterBaseline(JSContext*, EnterJitData*)");
     JitExecStatus status = EnterBaseline(cx, data);
     if (status != JitExec_Ok)
         return status;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->InterpreterFrame::setReturnValue()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->InterpreterFrame::setReturnValue()");
     fp->setReturnValue(data.result);
     return JitExec_Ok;
 }
@@ -301,14 +301,14 @@ CanEnterBaselineJIT(JSContext* cx, HandleScript script, InterpreterFrame* osrFra
     // Frames can be marked as debuggee frames independently of its underlying
     // script being a debuggee script, e.g., when performing
     // Debugger.Frame.prototype.eval.
-    YPHPRINTF("thread_%ld:%s:%d:%s:->BaselineCompile()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->BaselineCompile()");
     return BaselineCompile(cx, script, osrFrame && osrFrame->isDebuggee());
 }
 
 MethodStatus
 jit::CanEnterBaselineAtBranch(JSContext* cx, InterpreterFrame* fp, bool newType)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     if (!CheckFrame(fp))
        return Method_CantCompile;
 
@@ -356,7 +356,7 @@ jit::CanEnterBaselineMethod(JSContext* cx, RunState& state)
     }
 
     RootedScript script(cx, state.script());
-    YPHPRINTF("thread_%ld:%s:%d:%s:->CanEnterBaselineJIT()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->CanEnterBaselineJIT()");
     return CanEnterBaselineJIT(cx, script, /* osrFrame = */ nullptr);
 };
 

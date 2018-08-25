@@ -70,7 +70,7 @@ class JitCode : public gc::TenuredCell
         invalidated_(false),
         hasBytecodeMap_(false)
     {
-        YPHPRINTF("thread_%ld:%s:%d:%s:create JitCode instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("create JitCode instance");
         MOZ_ASSERT(CodeKind(kind_) == kind);
         MOZ_ASSERT(headerSize_ == headerSize);
     }

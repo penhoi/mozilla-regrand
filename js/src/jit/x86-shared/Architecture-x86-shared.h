@@ -66,7 +66,7 @@ static const uint32_t JumpImmediateRange = INT32_MAX;
 class Registers {
   public:
     Registers()
-    {   YPHPRINTF("thread_%ld:%s:%d:%s:defines the register set of x86 arch\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__); }
+    {   YPHPRINT("defines the register set of x86 arch"); }
     typedef uint8_t Code;
     typedef X86Encoding::RegisterID Encoding;   //Name space X86Encoding, enum RegisterID
 
