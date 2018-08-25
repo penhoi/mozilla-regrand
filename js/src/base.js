@@ -5,6 +5,7 @@ function test1()
 {
     var all = 0;
     for (var i=0; i<25; i++) {
+        print("Iteration", i);
         all += msg(i);
     }
     print("Total result is:", all);

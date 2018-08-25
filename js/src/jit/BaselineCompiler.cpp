@@ -88,6 +88,7 @@ BaselineCompiler::addPCMappingEntry(bool addIndexEntry)
 MethodStatus
 BaselineCompiler::compile()
 {
+    YPHPRINTF("thread_%ld:%s:%d:%s:Emitting baseline code for script %s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, script->filename());
     JitSpew(JitSpew_BaselineScripts, "Baseline compiling script %s:%zu (%p)",
             script->filename(), script->lineno(), script);
 
@@ -115,6 +116,7 @@ BaselineCompiler::compile()
 
     MOZ_ASSERT(!script->hasBaselineScript());
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:->self::emitPrologue() && ->self::emitBody() && \n->self::emitEpilogue() && ->self::emitOutOfLinePostBarrierSlot()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     if (!emitPrologue())
         return Method_Error;
 

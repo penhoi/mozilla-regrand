@@ -59,6 +59,7 @@ BytecodeAnalysis::init(TempAllocator& alloc, GSNCache& gsn)
 
     Vector<CatchFinallyRange, 0, JitAllocPolicy> catchFinallyRanges(alloc);
 
+    YPHPRINTF("thread_%ld:%s:%d:%s:Analyzing bytecodes\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     jsbytecode* nextpc;
     for (jsbytecode* pc = script_->code(); pc < end; pc = nextpc) {
         JSOp op = JSOp(*pc);

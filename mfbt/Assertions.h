@@ -455,7 +455,9 @@ struct AssertionConditionType
 
 #ifdef DEBUG
 #  define MOZ_ASSERT(...) MOZ_RELEASE_ASSERT(__VA_ARGS__)
-#define YPHPRINTF printf
+#define YPHPRINTF(...)          \
+        printf(__VA_ARGS__);    \
+        fflush(NULL)
 #else
 #  define MOZ_ASSERT(...) do { } while (0)
 #define YPHPRINTF
