@@ -1742,7 +1742,7 @@ Interpret(JSContext* cx, RunState& state)
 // Non-standard but faster indirect-goto-based dispatch.
 # define INTERPRETER_LOOP()
 # define CASE(OP)                 label_##OP:   \
-                                  YPHPRINT("label:%s\n", #OP);
+                                  YPHPRINT("label:%s", #OP);
 
 # define DEFAULT()                label_default:
 # define DISPATCH_TO(OP)          goto* addresses[(OP)]
@@ -1766,7 +1766,7 @@ Interpret(JSContext* cx, RunState& state)
 // Portable switch-based dispatch.
 # define INTERPRETER_LOOP()       the_switch: switch (switchOp)
 # define CASE(OP)                 case OP:      \
-                                  YPHPRINTF("OP-code:%s\n", #OP);
+                                  YPHPRINTF("OP-code:%s", #OP);
 
 # define DEFAULT()                default:
 # define DISPATCH_TO(OP)                                                      \

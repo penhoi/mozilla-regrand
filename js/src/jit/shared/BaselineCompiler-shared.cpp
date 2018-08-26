@@ -39,7 +39,9 @@ BaselineCompilerShared::BaselineCompilerShared(JSContext* cx, TempAllocator& all
     traceLoggerToggleOffsets_(cx),
     traceLoggerScriptTextIdOffset_()
 {
-    YPHPRINT("constuctor @%p \n has member *masm* instance of MacroAssembler", (void*)this);
+    YPHPRINT("constuctor @%p", (void*)this);
+    YPHPRINT("Has member *masm* instance of MacroAssembler");
+    YPHPRINT("Has member *analysis_* instance of BytecodeAnalysis");
 }
 
 void

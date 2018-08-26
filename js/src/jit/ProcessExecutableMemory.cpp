@@ -290,8 +290,8 @@ ReserveProcessExecutableMemory(size_t bytes)
 {
     // Note that randomAddr is just a hint: if the address is not available
     // mmap will pick a different address.
-    // void* randomAddr = ComputeRandomAllocationAddress();
-    void* randomAddr = (void*)0x60000000;
+    void* randomAddr = ComputeRandomAllocationAddress();
+    randomAddr = (void*)0x60000000;
     void* p = MozTaggedAnonymousMmap(randomAddr, bytes, PROT_NONE, MAP_PRIVATE | MAP_ANON,
                                      -1, 0, "js-executable-memory");
     if (p == MAP_FAILED)

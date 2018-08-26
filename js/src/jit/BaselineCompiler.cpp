@@ -89,7 +89,7 @@ MethodStatus
 BaselineCompiler::compile()
 {
     // YPHPRINT("Emitting baseline code for script %s", script->filename());
-    YPHPRINT("Emitting baseline code for script %s", script->filename());
+    YPHPRINT("Begin: Emitting baseline code for script %s", script->filename());
     JitSpew(JitSpew_BaselineScripts, "Baseline compiling script %s:%zu (%p)",
             script->filename(), script->lineno(), script);
 
@@ -117,7 +117,8 @@ BaselineCompiler::compile()
 
     MOZ_ASSERT(!script->hasBaselineScript());
 
-    YPHPRINT("->self::emitPrologue() && ->self::emitBody() && \n->self::emitEpilogue() && ->self::emitOutOfLinePostBarrierSlot()");
+    YPHPRINT("->self::emitPrologue() && ->self::emitBody() &&");
+    YPHPRINT("->self::emitEpilogue() && ->self::emitOutOfLinePostBarrierSlot()");
     if (!emitPrologue())
         return Method_Error;
 
@@ -314,6 +315,7 @@ BaselineCompiler::compile()
     vtune::MarkScript(code, script, "baseline");
 #endif
 
+    YPHPRINT("End");
     return Method_Compiled;
 }
 
@@ -322,7 +324,7 @@ BaselineCompiler::emitInitializeLocals()
 {
     // Initialize all locals to |undefined|. Lexical bindings are temporal
     // dead zoned in bytecode.
-
+    YPHPRINT("Begin");
     size_t n = frame.nlocals();
     if (n == 0)
         return;
@@ -353,12 +355,13 @@ BaselineCompiler::emitInitializeLocals()
         masm.branchSub32(Assembler::NonZero,
                          Imm32(LOOP_UNROLL_FACTOR), R1.scratchReg(), &pushLoop);
     }
+    YPHPRINT("End");
 }
 
 bool
 BaselineCompiler::emitPrologue()
 {
-    YPHPRINT();
+    YPHPRINT("Begin: ->self::emitProfilerEnterFrame() && ->self::emitInitializeLocals() && ...");
 #ifdef JS_USE_LINK_REGISTER
     // Push link register from generateEnterJIT()'s BLR.
     masm.pushReturnAddress();
@@ -445,13 +448,15 @@ BaselineCompiler::emitPrologue()
     if (!emitArgumentTypeChecks())
         return false;
 
+    YPHPRINT("End");
     return true;
 }
+
 
 bool
 BaselineCompiler::emitEpilogue()
 {
-    YPHPRINT();
+    YPHPRINT("Begine: ->self::emitProfilerExitFrame()");
     // Record the offset of the epilogue, so we can do early return from
     // Debugger handlers during on-stack recompile.
     epilogueOffset_ = CodeOffset(masm.currentOffset());
@@ -469,6 +474,8 @@ BaselineCompiler::emitEpilogue()
     emitProfilerExitFrame();
 
     masm.ret();
+
+    YPHPRINT("End");
     return true;
 }
 
@@ -481,7 +488,7 @@ BaselineCompiler::emitEpilogue()
 bool
 BaselineCompiler::emitOutOfLinePostBarrierSlot()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     masm.bind(&postBarrierSlot_);
 
     Register objReg = R2.scratchReg();
@@ -507,13 +514,15 @@ BaselineCompiler::emitOutOfLinePostBarrierSlot()
 
     masm.popValue(R0);
     masm.ret();
+
+    YPHPRINT("End");
     return true;
 }
 
 bool
 BaselineCompiler::emitIC(ICStub* stub, ICEntry::Kind kind)
 {
-    YPHPRINT();
+    YPHPRINT("Begin: ->EmitCallIC()");
     BaselineICEntry* entry = allocateICEntry(stub, kind);
     if (!entry)
         return false;
@@ -524,6 +533,7 @@ BaselineCompiler::emitIC(ICStub* stub, ICEntry::Kind kind)
     if (!addICLoadLabel(patchOffset))
         return false;
 
+    YPHPRINT("End");
     return true;
 }
 
@@ -535,7 +545,7 @@ static const VMFunction CheckOverRecursedWithExtraInfo =
 bool
 BaselineCompiler::emitStackCheck(bool earlyCheck)
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     Label skipCall;
     uint32_t slotsSize = script->nslots() * sizeof(Value);
     uint32_t tolerance = earlyCheck ? slotsSize : 0;
@@ -591,13 +601,15 @@ BaselineCompiler::emitStackCheck(bool earlyCheck)
                                   : ICEntry::Kind_StackCheck);
 
     masm.bind(&skipCall);
+
+    YPHPRINT("End");
     return true;
 }
 
 void
 BaselineCompiler::emitIsDebuggeeCheck()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     if (compileDebugInstrumentation_) {
         masm.Push(BaselineFrameReg);
         masm.setupUnalignedABICall(R0.scratchReg());
@@ -606,6 +618,7 @@ BaselineCompiler::emitIsDebuggeeCheck()
         masm.callWithABI(JS_FUNC_TO_DATA_PTR(void*, jit::FrameIsDebuggeeCheck));
         masm.Pop(BaselineFrameReg);
     }
+    YPHPRINT("End");
 }
 
 typedef bool (*DebugPrologueFn)(JSContext*, BaselineFrame*, jsbytecode*, bool*);
@@ -615,7 +628,7 @@ static const VMFunction DebugPrologueInfo =
 bool
 BaselineCompiler::emitDebugPrologue()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     if (compileDebugInstrumentation_) {
         // Load pointer to BaselineFrame in R0.
         masm.loadBaselineFramePtr(BaselineFrameReg, R0.scratchReg());
@@ -642,6 +655,7 @@ BaselineCompiler::emitDebugPrologue()
 
     postDebugPrologueOffset_ = CodeOffset(masm.currentOffset());
 
+    YPHPRINT("End");
     return true;
 }
 
@@ -658,7 +672,7 @@ static const VMFunction InitFunctionEnvironmentObjectsInfo =
 bool
 BaselineCompiler::initEnvironmentChain()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     CallVMPhase phase = POST_INITIALIZE;
     if (needsEarlyStackCheck())
         phase = CHECK_OVER_RECURSED;
@@ -701,6 +715,7 @@ BaselineCompiler::initEnvironmentChain()
             return false;
     }
 
+    YPHPRINT("End");
     return true;
 }
 
@@ -711,7 +726,7 @@ static const VMFunction InterruptCheckInfo =
 bool
 BaselineCompiler::emitInterruptCheck()
 {
-    YPHPRINT();
+    YPHPRINT("Begin:->super::prepareVMCall()");
     frame.syncStack(0);
 
     Label done;
@@ -726,6 +741,8 @@ BaselineCompiler::emitInterruptCheck()
         return false;
 
     masm.bind(&done);
+
+    YPHPRINT("End");
     return true;
 }
 
@@ -737,7 +754,7 @@ static const VMFunction IonCompileScriptForBaselineInfo =
 bool
 BaselineCompiler::emitWarmUpCounterIncrement(bool allowOsr)
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     // Emit no warm-up counter increments or bailouts if Ion is not
     // enabled, or if the script will never be Ion-compileable
 
@@ -802,13 +819,14 @@ BaselineCompiler::emitWarmUpCounterIncrement(bool allowOsr)
     }
     masm.bind(&skipCall);
 
+    YPHPRINT("End");
     return true;
 }
 
 bool
 BaselineCompiler::emitArgumentTypeChecks()
 {
-    YPHPRINT();
+    YPHPRINT("Begin:->self::emitNonOpIC()");
     if (!function())
         return true;
 
@@ -828,13 +846,14 @@ BaselineCompiler::emitArgumentTypeChecks()
             return false;
     }
 
+    YPHPRINT("End");
     return true;
 }
 
 bool
 BaselineCompiler::emitDebugTrap()
 {
-    YPHPRINT();
+    YPHPRINT("Begin:->super::appendICEntry()");
     MOZ_ASSERT(compileDebugInstrumentation_);
     MOZ_ASSERT(frame.numUnsyncedSlots() == 0);
 
@@ -853,14 +872,17 @@ BaselineCompiler::emitDebugTrap()
 #endif
 
     // Add an IC entry for the return offset -> pc mapping.
-    return appendICEntry(ICEntry::Kind_DebugTrap, masm.currentOffset());
+    bool b = appendICEntry(ICEntry::Kind_DebugTrap, masm.currentOffset());
+
+    YPHPRINT("End");
+    return b;
 }
 
 #ifdef JS_TRACE_LOGGING
 bool
 BaselineCompiler::emitTraceLoggerEnter()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     AllocatableRegisterSet regs(RegisterSet::Volatile());
     Register loggerReg = regs.takeAnyGeneral();
     Register scriptReg = regs.takeAnyGeneral();
@@ -889,13 +911,14 @@ BaselineCompiler::emitTraceLoggerEnter()
 
     masm.bind(&noTraceLogger);
 
+    YPHPRINT("End");
     return true;
 }
 
 bool
 BaselineCompiler::emitTraceLoggerExit()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     AllocatableRegisterSet regs(RegisterSet::Volatile());
     Register loggerReg = regs.takeAnyGeneral();
 
@@ -913,13 +936,14 @@ BaselineCompiler::emitTraceLoggerExit()
 
     masm.bind(&noTraceLogger);
 
+    YPHPRINT("End");
     return true;
 }
 
 bool
 BaselineCompiler::emitTraceLoggerResume(Register baselineScript, AllocatableGeneralRegisterSet& regs)
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     Register scriptId = regs.takeAny();
     Register loggerReg = regs.takeAny();
 
@@ -939,6 +963,7 @@ BaselineCompiler::emitTraceLoggerResume(Register baselineScript, AllocatableGene
 
     masm.bind(&noTraceLogger);
 
+    YPHPRINT("End");
     return true;
 }
 #endif
@@ -946,7 +971,7 @@ BaselineCompiler::emitTraceLoggerResume(Register baselineScript, AllocatableGene
 void
 BaselineCompiler::emitProfilerEnterFrame()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     // Store stack position to lastProfilingFrame variable, guarded by a toggled jump.
     // Starts off initially disabled.
     Label noInstrument;
@@ -957,12 +982,14 @@ BaselineCompiler::emitProfilerEnterFrame()
     // Store the start offset in the appropriate location.
     MOZ_ASSERT(!profilerEnterFrameToggleOffset_.bound());
     profilerEnterFrameToggleOffset_ = toggleOffset;
+
+    YPHPRINT("End");
 }
 
 void
 BaselineCompiler::emitProfilerExitFrame()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     // Store previous frame to lastProfilingFrame variable, guarded by a toggled jump.
     // Starts off initially disabled.
     Label noInstrument;
@@ -973,12 +1000,13 @@ BaselineCompiler::emitProfilerExitFrame()
     // Store the start offset in the appropriate location.
     MOZ_ASSERT(!profilerExitFrameToggleOffset_.bound());
     profilerExitFrameToggleOffset_ = toggleOffset;
+    YPHPRINT("End");
 }
 
 MethodStatus
 BaselineCompiler::emitBody()
 {
-    YPHPRINT();
+    YPHPRINT("Begin");
     MOZ_ASSERT(pc == script->code());
 
     bool lastOpUnreachable = false;
@@ -1082,6 +1110,8 @@ OPCODE_LIST(EMIT_OP)
     }
 
     MOZ_ASSERT(JSOp(*prevpc) == JSOP_RETRVAL);
+
+    YPHPRINT("End");
     return Method_Compiled;
 }
 
