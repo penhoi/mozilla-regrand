@@ -2182,11 +2182,11 @@ Now(JSContext* cx, unsigned argc, Value* vp)
 static bool
 PrintInternal(JSContext* cx, const CallArgs& args, RCFile* file)
 {
+    YPHPRINTF("Begin: Invoke ->fprintf() && ->fputc()");
     if (!file->isOpen()) {
         JS_ReportErrorASCII(cx, "output file is closed");
         return false;
     }
-
     for (unsigned i = 0; i < args.length(); i++) {
         RootedString str(cx, JS::ToString(cx, args[i]));
         if (!str)
@@ -2201,6 +2201,7 @@ PrintInternal(JSContext* cx, const CallArgs& args, RCFile* file)
     fputc('\n', file->fp);
     fflush(file->fp);
 
+    YPHPRINTF("End");
     args.rval().setUndefined();
     return true;
 }

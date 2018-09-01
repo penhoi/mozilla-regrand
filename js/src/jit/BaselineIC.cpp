@@ -2465,6 +2465,7 @@ static bool
 DoCallFallback(JSContext* cx, BaselineFrame* frame, ICCall_Fallback* stub_, uint32_t argc,
                Value* vp, MutableHandleValue res)
 {
+    YPHPRINTF("Begin: May invoked by JIT-code");
     // This fallback stub may trigger debug mode toggling.
     DebugModeOSRVolatileStub<ICCall_Fallback*> stub(frame, stub_);
 
@@ -2583,6 +2584,8 @@ DoCallFallback(JSContext* cx, BaselineFrame* frame, ICCall_Fallback* stub_, uint
 
     if (!handled)
         stub->noteUnoptimizableCall();
+
+    YPHPRINTF("End");
     return true;
 }
 

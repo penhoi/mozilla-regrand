@@ -288,6 +288,7 @@ CallJSNative(JSContext* cx, Native native, const CallArgs& args)
     bool alreadyThrowing = cx->isExceptionPending();
 #endif
     assertSameCompartment(cx, args);
+    YPHPRINTF("->native() Invoke native function specified in Native");
     bool ok = native(cx, args.length(), args.base());
     if (ok) {
         assertSameCompartment(cx, args.rval());
@@ -304,6 +305,7 @@ CallNativeImpl(JSContext* cx, NativeImpl impl, const CallArgs& args)
     bool alreadyThrowing = cx->isExceptionPending();
 #endif
     assertSameCompartment(cx, args);
+    YPHPRINTF("->impl(cx, args), invoke function specified by NativeImpl@impl");
     bool ok = impl(cx, args);
     if (ok) {
         assertSameCompartment(cx, args.rval());
@@ -356,6 +358,7 @@ CallJSGetterOp(JSContext* cx, GetterOp op, HandleObject obj, HandleId id,
         return false;
 
     assertSameCompartment(cx, obj, id, vp);
+    YPHPRINTF("->op(cx, obj, id, vp)");
     bool ok = op(cx, obj, id, vp);
     if (ok)
         assertSameCompartment(cx, vp);
@@ -370,6 +373,7 @@ CallJSSetterOp(JSContext* cx, SetterOp op, HandleObject obj, HandleId id, Handle
         return false;
 
     assertSameCompartment(cx, obj, id, v);
+    YPHPRINTF("->op(cx, obj, id, v, result)");
     return op(cx, obj, id, v, result);
 }
 
@@ -381,6 +385,7 @@ CallJSAddPropertyOp(JSContext* cx, JSAddPropertyOp op, HandleObject obj, HandleI
         return false;
 
     assertSameCompartment(cx, obj, id, v);
+    YPHPRINTF("->op(cx, obj, id, v)");
     return op(cx, obj, id, v);
 }
 
@@ -392,8 +397,10 @@ CallJSDeletePropertyOp(JSContext* cx, JSDeletePropertyOp op, HandleObject receiv
         return false;
 
     assertSameCompartment(cx, receiver, id);
-    if (op)
+    if (op) {
+        YPHPRINTF("->op(cx, receiver, id, result)");
         return op(cx, receiver, id, result);
+    }
     return result.succeed();
 }
 
@@ -403,8 +410,10 @@ CheckForInterrupt(JSContext* cx)
     MOZ_ASSERT(!cx->isExceptionPending());
     // Add an inline fast-path since we have to check for interrupts in some hot
     // C++ loops of library builtins.
-    if (MOZ_UNLIKELY(cx->hasPendingInterrupt()))
+    if (MOZ_UNLIKELY(cx->hasPendingInterrupt())) {
+        YPHPRINTF("->JSContext::handleInterrupt()");
         return cx->handleInterrupt();
+    }
 
     JS_INTERRUPT_POSSIBLY_FAIL();
 

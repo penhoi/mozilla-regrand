@@ -450,6 +450,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
     /* Invoke non-functions. */
     if (MOZ_UNLIKELY(!args.callee().is<JSFunction>())) {
         MOZ_ASSERT_IF(construct, !args.callee().constructHook());
+        YPHPRINTF("->CallJSNative(cx, call, args), Invoke non-functions");
         JSNative call = args.callee().callHook();
         if (!call)
             return ReportIsNotFunction(cx, args.calleev(), skipForCallee, construct);
@@ -464,6 +465,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
     }
 
     if (fun->isNative()) {
+        YPHPRINTF("->CallJSNative(cx, native, args), Call native function");
         MOZ_ASSERT_IF(construct, !fun->isConstructor());
         JSNative native = fun->native();
         if (!construct && args.ignoresReturnValue()) {
