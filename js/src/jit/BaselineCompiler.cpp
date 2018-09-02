@@ -456,7 +456,7 @@ BaselineCompiler::emitPrologue()
 bool
 BaselineCompiler::emitEpilogue()
 {
-    YPHPRINT("Begine: ->self::emitProfilerExitFrame()");
+    YPHPRINT("Begin: ->self::emitProfilerExitFrame()");
     // Record the offset of the epilogue, so we can do early return from
     // Debugger handlers during on-stack recompile.
     epilogueOffset_ = CodeOffset(masm.currentOffset());

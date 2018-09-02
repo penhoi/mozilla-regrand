@@ -450,6 +450,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
     /* Invoke non-functions. */
     if (MOZ_UNLIKELY(!args.callee().is<JSFunction>())) {
         MOZ_ASSERT_IF(construct, !args.callee().constructHook());
+        YPHPRINT("->CallJSNative(cx, call, args), Invoke non-functions");
         JSNative call = args.callee().callHook();
         if (!call)
             return ReportIsNotFunction(cx, args.calleev(), skipForCallee, construct);
@@ -464,6 +465,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
     }
 
     if (fun->isNative()) {
+        YPHPRINT("->CallJSNative(cx, native, args), Call native function");
         MOZ_ASSERT_IF(construct, !fun->isConstructor());
         JSNative native = fun->native();
         if (!construct && args.ignoresReturnValue()) {
@@ -1742,7 +1744,7 @@ Interpret(JSContext* cx, RunState& state)
 // Non-standard but faster indirect-goto-based dispatch.
 # define INTERPRETER_LOOP()
 # define CASE(OP)                 label_##OP:   \
-                                  YPHPRINT("label:%s", #OP);
+                                  printf("label:%s", #OP);
 
 # define DEFAULT()                label_default:
 # define DISPATCH_TO(OP)          goto* addresses[(OP)]
@@ -1766,7 +1768,7 @@ Interpret(JSContext* cx, RunState& state)
 // Portable switch-based dispatch.
 # define INTERPRETER_LOOP()       the_switch: switch (switchOp)
 # define CASE(OP)                 case OP:      \
-                                  YPHPRINTF("OP-code:%s", #OP);
+                                  printf("OP-code:%s", #OP);
 
 # define DEFAULT()                default:
 # define DISPATCH_TO(OP)                                                      \
