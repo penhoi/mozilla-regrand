@@ -3,7 +3,7 @@ var summary = 'Array.prototype.shift on a dense array with holes should update f
 
 print(BUGNUMBER + ": " + summary);
 
-var x = ["a", , "b", , "c", "d" , "e", "f", "g"];
+var x = ["a", "b", "c", "d" , "e", "f", "g"];
 for (var p in x) {
   assertEq(p in x, true);
   x.shift();

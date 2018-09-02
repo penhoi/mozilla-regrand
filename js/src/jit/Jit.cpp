@@ -92,7 +92,7 @@ EnterJit(JSContext* cx, RunState& state, uint8_t* code)
         ActivationEntryMonitor entryMonitor(cx, calleeToken);
         JitActivation activation(cx);
 
-        YPHPRINTF("thread_%ld:%s:%d:%s:create EnterJitCode && ->CALL_GENERATED_CODE\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("create EnterJitCode && ->CALL_GENERATED_CODE");
         EnterJitCode enter = cx->runtime()->jitRuntime()->enterJit();
 
 #ifdef DEBUG
@@ -139,7 +139,7 @@ js::jit::MaybeEnterJit(JSContext* cx, RunState& state)
 
         // Try to Ion-compile.
         if (jit::IsIonEnabled(cx)) {
-            YPHPRINTF("thread_%ld:%s:%d:%s:->jit::CanEnterIon()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("->jit::CanEnterIon()");
             jit::MethodStatus status = jit::CanEnterIon(cx, state);
             if (status == jit::Method_Error)
                 return EnterJitStatus::Error;
@@ -151,7 +151,7 @@ js::jit::MaybeEnterJit(JSContext* cx, RunState& state)
 
         // Try to Baseline-compile.
         if (jit::IsBaselineEnabled(cx)) {
-            YPHPRINTF("thread_%ld:%s:%d:%s:->jit::CanEnterBaselineMethod()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("->jit::CanEnterBaselineMethod()");
             jit::MethodStatus status = jit::CanEnterBaselineMethod(cx, state);
             if (status == jit::Method_Error)
                 return EnterJitStatus::Error;
@@ -164,6 +164,6 @@ js::jit::MaybeEnterJit(JSContext* cx, RunState& state)
         return EnterJitStatus::NotEntered;
     } while (false);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->EnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->EnterJit()");
     return EnterJit(cx, state, code);
 }

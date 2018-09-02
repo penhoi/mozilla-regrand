@@ -2689,7 +2689,7 @@ void
 JSScript::initCompartment(JSContext* cx)
 {
     compartment_ = cx->compartment();
-    YPHPRINTF("thread_%ld:%s:%d:%s:bind to the JSCompartment @%p of a JSContext instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, compartment_);
+    YPHPRINT("bind to the JSCompartment @%p of a JSContext instance", compartment_);
 }
 
 /* static */ JSScript*
@@ -2712,7 +2712,7 @@ JSScript::Create(JSContext* cx, const ReadOnlyCompileOptions& options,
 
     PodZero(script.get());
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:create JSScript @%p && invoke JSScript::initCompartment\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, script.get());
+    YPHPRINT("create JSScript @%p && invoke JSScript::initCompartment", script.get());
     script->initCompartment(cx);
 
 #ifndef JS_CODEGEN_NONE
@@ -4277,7 +4277,7 @@ LazyScript::LazyScript(JSFunction* fun, void* table, uint64_t packedFields,
     lineno_(lineno),
     column_(column)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("constructor");
     MOZ_ASSERT(begin <= end);
     MOZ_ASSERT(toStringStart <= begin);
 }

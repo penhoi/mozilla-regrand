@@ -4700,7 +4700,7 @@ ExecuteScript(JSContext* cx, HandleObject scope, HandleScript script, Value* rva
     CHECK_REQUEST(cx);
     assertSameCompartment(cx, scope, script);
     MOZ_ASSERT_IF(!IsGlobalLexicalEnvironment(scope), script->hasNonSyntacticScope());
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     return Execute(cx, script, *scope, rval);
 }
 
@@ -4719,7 +4719,7 @@ ExecuteScript(JSContext* cx, AutoObjectVector& envChain, HandleScript scriptArg,
             return false;
         js::Debugger::onNewScript(cx, script);
     }
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     return ExecuteScript(cx, env, script, rval);
 }
 
@@ -4796,14 +4796,14 @@ Evaluate(JSContext* cx, ScopeKind scopeKind, HandleObject env,
     assertSameCompartment(cx, env);
     MOZ_ASSERT_IF(!IsGlobalLexicalEnvironment(env), scopeKind == ScopeKind::NonSyntactic);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke CompileGlobalScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke CompileGlobalScript()");
     options.setIsRunOnce(true);
     RootedScript script(cx, frontend::CompileGlobalScript(cx, cx->tempLifoAlloc(),
                                                           scopeKind, options, srcBuf));
     if (!script)
         return false;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke Execute() on global-script\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke Execute() on global-script");
     bool result = Execute(cx, script, *env,
                           options.noScriptRval ? nullptr : rval.address());
 

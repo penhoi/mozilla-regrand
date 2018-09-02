@@ -103,7 +103,7 @@ JSContext::init(ContextKind kind)
 {
     // Skip most of the initialization if this thread will not be running JS.
     if (kind == ContextKind::Cooperative) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:bind to current thread\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("bind to current thread");
         // Get a platform-native handle for this thread, used by js::InterruptRunningJitCode.
 #ifdef XP_WIN
         size_t openFlags = THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME |
@@ -129,7 +129,7 @@ JSContext::init(ContextKind kind)
         if (!simulator_)
             return false;
 #endif
-        YPHPRINTF("thread_%ld:%s:%d:%s:invoke EnsureSignalHandlers\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("invoke EnsureSignalHandlers");
         if (!wasm::EnsureSignalHandlers(this))
             return false;
     }
@@ -152,19 +152,19 @@ js::NewContext(uint32_t maxBytes, uint32_t maxNurseryBytes, JSRuntime* parentRun
     js::oom::SetThreadType(!parentRuntime ? js::THREAD_TYPE_COOPERATING
                                           : js::THREAD_TYPE_WORKER);
 #endif
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke js_new create JSRuntime\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke js_new create JSRuntime");
     JSRuntime* runtime = js_new<JSRuntime>(parentRuntime);
     if (!runtime)
         return nullptr;
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke js_new create JSContext\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke js_new create JSContext");
     JSContext* cx = js_new<JSContext>(runtime, JS::ContextOptions());
     if (!cx) {
         js_delete(runtime);
         return nullptr;
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke JSRuntime:init()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke JSRuntime:init()");
     if (!runtime->init(cx, maxBytes, maxNurseryBytes)) {
         runtime->destroyRuntime();
         js_delete(cx);
@@ -172,7 +172,7 @@ js::NewContext(uint32_t maxBytes, uint32_t maxNurseryBytes, JSRuntime* parentRun
         return nullptr;
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:invoke JSContext:init(ContextKind::Cooperative)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("invoke JSContext:init(ContextKind::Cooperative)");
     if (!cx->init(ContextKind::Cooperative)) {
         runtime->destroyRuntime();
         js_delete(cx);
@@ -1363,7 +1363,7 @@ JSContext::JSContext(JSRuntime* runtime, const JS::ContextOptions& options)
     promiseRejectionTrackerCallback(nullptr),
     promiseRejectionTrackerCallbackData(nullptr)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constructor\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("constructor");
     MOZ_ASSERT(static_cast<JS::RootingContext*>(this) ==
                JS::RootingContext::get(this));
 
@@ -1412,7 +1412,7 @@ JSContext::~JSContext()
 void
 JSContext::setRuntime(JSRuntime* rt)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:bind to a JSRuntime instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("bind to a JSRuntime instance");
     MOZ_ASSERT(!resolvingList);
     MOZ_ASSERT(!compartment());
     MOZ_ASSERT(!activation());

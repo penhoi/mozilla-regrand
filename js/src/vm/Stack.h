@@ -863,7 +863,7 @@ class InterpreterRegs
             name = script->getScriptName();
         else
             name = "No Name";
-        YPHPRINTF("thread_%ld:%s:%d:%s:prepareToRun %s: set pc & sp\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, name);
+        YPHPRINT("prepareToRun %s: set pc & sp", name);
     }
 
     void setToEndOfScript();
@@ -910,7 +910,7 @@ class InterpreterStack
       : allocator_(DEFAULT_CHUNK_SIZE),
         frameCount_(0)
     {
-        YPHPRINTF("thread_%ld:%s:%d:%s:constructor this@%p\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+        YPHPRINT("constructor this@%p", (void*)this);
     }
 
     ~InterpreterStack() {

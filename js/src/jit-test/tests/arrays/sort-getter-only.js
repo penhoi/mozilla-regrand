@@ -2,7 +2,7 @@
 
 load(libdir + "asserts.js");
 
-var a = ["A", , "B", "C", "D"];
+var a = ["A", "B", "C", "D"];
 var normalArrayElementDesc = Object.getOwnPropertyDescriptor(a, 0);
 var getterDesc = {
     get: function () { return "F"; },

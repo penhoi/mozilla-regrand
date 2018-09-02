@@ -4911,7 +4911,7 @@ BytecodeEmitter::emitScript(ParseNode* body)
         if (!lexicalEmitterScope.leave(this))
             return false;
     } else {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->emitTree()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->emitTree()");
         if (!emitTree(body))
             return false;
     }
@@ -7841,7 +7841,7 @@ BytecodeEmitter::emitFunction(ParseNode* pn, bool needsProto)
             const TransitiveCompileOptions& transitiveOptions = parser.options();
             CompileOptions options(cx, transitiveOptions);
 
-            YPHPRINTF("thread_%ld:%s:%d:%s:create JSScript instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("create JSScript instance");
             Rooted<JSObject*> sourceObject(cx, script->sourceObject());
             Rooted<JSScript*> script(cx, JSScript::Create(cx, options, sourceObject,
                                                           funbox->bufStart, funbox->bufEnd,
@@ -8729,7 +8729,7 @@ BytecodeEmitter::emitStatementList(ParseNode* pn)
 {
     MOZ_ASSERT(pn->isArity(PN_LIST));
     for (ParseNode* pn2 = pn->pn_head; pn2; pn2 = pn2->pn_next) {
-        // YPHPRINTF("thread_%ld:%s:%d:%s:->emitTree()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        // YPHPRINT("->emitTree()");
         if (!emitTree(pn2))
             return false;
     }

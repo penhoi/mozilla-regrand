@@ -135,7 +135,7 @@ MacroAssembler::passABIArg(FloatRegister reg, MoveOp::Type type)
 void
 MacroAssembler::callWithABI(void* fun, MoveOp::Type result, CheckUnsafeCallWithABI check)
 {
-    ::YPHPRINTF("thread_%ld:%s:%d:%s:create AutoProfilerCallInstrumentation && self->callWithABINoProfiler()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    ::YPHPRINT("create AutoProfilerCallInstrumentation && self->callWithABINoProfiler()");
     AutoProfilerCallInstrumentation profiler(*this);
     callWithABINoProfiler(fun, result, check);
 }
@@ -143,7 +143,7 @@ MacroAssembler::callWithABI(void* fun, MoveOp::Type result, CheckUnsafeCallWithA
 void
 MacroAssembler::callWithABI(Register fun, MoveOp::Type result)
 {
-    ::YPHPRINTF("thread_%ld:%s:%d:%s:create AutoProfilerCallInstrumentation && self->callWithABINoProfiler()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    ::YPHPRINT("create AutoProfilerCallInstrumentation && self->callWithABINoProfiler()");
     AutoProfilerCallInstrumentation profiler(*this);
     callWithABINoProfiler(fun, result);
 }
@@ -151,7 +151,7 @@ MacroAssembler::callWithABI(Register fun, MoveOp::Type result)
 void
 MacroAssembler::callWithABI(const Address& fun, MoveOp::Type result)
 {
-    ::YPHPRINTF("thread_%ld:%s:%d:%s:create AutoProfilerCallInstrumentation && self->callWithABINoProfiler()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    ::YPHPRINT("create AutoProfilerCallInstrumentation && self->callWithABINoProfiler()");
     AutoProfilerCallInstrumentation profiler(*this);
     callWithABINoProfiler(fun, result);
 }

@@ -1788,7 +1788,7 @@ class JSScript : public js::gc::TenuredCell
     void takeOverScriptCountsMapEntry(js::ScriptCounts* entryValue);
 
     jsbytecode* main() const {
-        // YPHPRINTF("thread_%ld:%s:%d:%s:return code() + mainOffset()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        // YPHPRINT("return code() + mainOffset()");
         return code() + mainOffset();
     }
 

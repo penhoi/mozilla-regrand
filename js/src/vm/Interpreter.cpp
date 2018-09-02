@@ -405,7 +405,7 @@ js::RunScript(JSContext* cx, RunState& state)
 
     state.script()->ensureNonLazyCanonicalFunction();
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->jit::MaybeEnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->jit::MaybeEnterJit()");
     jit::EnterJitStatus status = jit::MaybeEnterJit(cx, state);
     switch (status) {
       case jit::EnterJitStatus::Error:
@@ -420,7 +420,7 @@ js::RunScript(JSContext* cx, RunState& state)
         InvokeState& invoke = *state.asInvoke();
         TypeMonitorCall(cx, invoke.args(), invoke.constructing());
     }
-    YPHPRINTF("thread_%ld:%s:%d:%s:->Interpret()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->Interpret()");
     return Interpret(cx, state);
 }
 #ifdef _MSC_VER
@@ -450,7 +450,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
     /* Invoke non-functions. */
     if (MOZ_UNLIKELY(!args.callee().is<JSFunction>())) {
         MOZ_ASSERT_IF(construct, !args.callee().constructHook());
-        YPHPRINTF("->CallJSNative(cx, call, args), Invoke non-functions");
+        YPHPRINT("->CallJSNative(cx, call, args), Invoke non-functions");
         JSNative call = args.callee().callHook();
         if (!call)
             return ReportIsNotFunction(cx, args.calleev(), skipForCallee, construct);
@@ -465,7 +465,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
     }
 
     if (fun->isNative()) {
-        YPHPRINTF("->CallJSNative(cx, native, args), Call native function");
+        YPHPRINT("->CallJSNative(cx, native, args), Call native function");
         MOZ_ASSERT_IF(construct, !fun->isConstructor());
         JSNative native = fun->native();
         if (!construct && args.ignoresReturnValue()) {
@@ -495,7 +495,7 @@ js::InternalCallOrConstruct(JSContext* cx, const CallArgs& args, MaybeConstruct 
             return false;
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->RunScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->RunScript()");
     bool ok = RunScript(cx, state);
 
     MOZ_ASSERT_IF(ok && construct, args.rval().isObject());
@@ -523,14 +523,14 @@ InternalCall(JSContext* cx, const AnyInvokeArgs& args)
         }
     }
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->InternalCallOrConstruct()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->InternalCallOrConstruct()");
     return InternalCallOrConstruct(cx, args, NO_CONSTRUCT);
 }
 
 bool
 js::CallFromStack(JSContext* cx, const CallArgs& args)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:->InternalCall()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->InternalCall()");
     return InternalCall(cx, static_cast<const AnyInvokeArgs&>(args));
 }
 
@@ -708,7 +708,7 @@ js::ExecuteKernel(JSContext* cx, HandleScript script, JSObject& envChainArg,
     }
 
     probes::StartExecution(script);
-    YPHPRINTF("thread_%ld:%s:%d:%s:create ExecuteState && ->RunScript()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("create ExecuteState && ->RunScript()");
     ExecuteState state(cx, script, newTargetValue, envChainArg, evalInFrame, result);
     bool ok = RunScript(cx, state);
     probes::StopExecution(script);
@@ -742,7 +742,7 @@ js::Execute(JSContext* cx, HandleScript script, JSObject& envChainArg, Value* rv
     } while ((s = s->enclosingEnvironment()));
 #endif
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->ExecuteKernel()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->ExecuteKernel()");
     return ExecuteKernel(cx, script, *envChain, NullValue(),
                          NullFramePtr() /* evalInFrame */, rval);
 }
@@ -1744,7 +1744,7 @@ Interpret(JSContext* cx, RunState& state)
 // Non-standard but faster indirect-goto-based dispatch.
 # define INTERPRETER_LOOP()
 # define CASE(OP)                 label_##OP:   \
-                                  YPHPRINTF("label:%s\n", #OP);
+                                  YPHPRINT("label:%s\n", #OP);
 
 # define DEFAULT()                label_default:
 # define DISPATCH_TO(OP)          goto* addresses[(OP)]
@@ -1768,7 +1768,7 @@ Interpret(JSContext* cx, RunState& state)
 // Portable switch-based dispatch.
 # define INTERPRETER_LOOP()       the_switch: switch (switchOp)
 # define CASE(OP)                 case OP:      \
-                                  YPHPRINTF("OP-code:%s\n", #OP);
+                                  YPHPRINT("OP-code:%s\n", #OP);
 
 # define DEFAULT()                default:
 # define DISPATCH_TO(OP)                                                      \
@@ -1903,7 +1903,7 @@ Interpret(JSContext* cx, RunState& state)
         name = script->getScriptName();
     else
         name = "No Name";
-    YPHPRINTF("thread_%ld:%s:%d:%s:interpre script: %s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, name);
+    YPHPRINT("interpre script: %s", name);
 
 
     TraceLoggerThread* logger = TraceLoggerForCurrentThread(cx);
@@ -1956,7 +1956,7 @@ Interpret(JSContext* cx, RunState& state)
     COUNT_COVERAGE_MAIN();
 
     // Enter the interpreter loop starting at the current pc.
-    YPHPRINTF("thread_%ld:%s:%d:%s:Enter the interpreter loop\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("Enter the interpreter loop");
     DumpPC(cx);
     ADVANCE_AND_DISPATCH(0);
 
@@ -2059,7 +2059,7 @@ CASE(JSOP_LOOPENTRY)
     COUNT_COVERAGE();
     // Attempt on-stack replacement with Baseline code.
     if (jit::IsBaselineEnabled(cx)) {
-        YPHPRINTF("thread_%ld:%s:%d:%s:->jit::CanEnterBaselineAtBranch()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->jit::CanEnterBaselineAtBranch()");
         jit::MethodStatus status = jit::CanEnterBaselineAtBranch(cx, REGS.fp(), false);
         if (status == jit::Method_Error)
             goto error;
@@ -2068,10 +2068,10 @@ CASE(JSOP_LOOPENTRY)
 
             jit::JitExecStatus maybeOsr;
             {
-                YPHPRINTF("thread_%ld:%s:%d:%s:maybeOsr before->jit::EnterBaselineAtBranch()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+                YPHPRINT("maybeOsr before->jit::EnterBaselineAtBranch()");
                 GeckoProfilerBaselineOSRMarker osr(cx, wasProfiler);
                 maybeOsr = jit::EnterBaselineAtBranch(cx, REGS.fp(), REGS.pc);
-                YPHPRINTF("thread_%ld:%s:%d:%s:maybeOsr after->jit::EnterBaselineAtBranch()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+                YPHPRINT("maybeOsr after->jit::EnterBaselineAtBranch()");
             }
 
             // We failed to call into baseline at all, so treat as an error.
@@ -2148,7 +2148,7 @@ END_CASE(JSOP_LEAVEWITH)
 CASE(JSOP_RETURN)
     POP_RETURN_VALUE();
     /* FALL THROUGH */
-    YPHPRINTF("thread_%ld:%s:%d:%s:case(JSOP_RETURN) fall through to case(JSOP_RETRVAL)\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("case(JSOP_RETURN) fall through to case(JSOP_RETRVAL)");
 
 CASE(JSOP_RETRVAL)
 {
@@ -2179,7 +2179,7 @@ CASE(JSOP_RETRVAL)
         }
 
   jit_return_pop_frame:
-        YPHPRINTF("thread_%ld:%s:%d:%s:label jit_return_pop_frame: ->Activation::popInlineFrame() \n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("label jit_return_pop_frame: ->Activation::popInlineFrame() ");
         activation.popInlineFrame(REGS.fp());
         SET_SCRIPT(REGS.fp()->script());
 
@@ -2190,7 +2190,7 @@ CASE(JSOP_RETRVAL)
         /* Resume execution in the calling frame. */
         if (MOZ_LIKELY(interpReturnOK)) {
             TypeScript::Monitor(cx, script, REGS.pc, REGS.sp[-1]);
-            YPHPRINTF("thread_%ld:%s:%d:%s:label jit_return: Resume execution in the calling frame \n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("label jit_return: Resume execution in the calling frame ");
             ADVANCE_AND_DISPATCH(JSOP_CALL_LENGTH);
         }
 
@@ -3119,11 +3119,11 @@ CASE(JSOP_FUNCALL)
                 ReportValueError(cx, JSMSG_NOT_ITERABLE, -1, args.thisv(), nullptr);
                 goto error;
             }
-            YPHPRINTF("thread_%ld:%s:%d:%s:->CallFromStack()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("->CallFromStack()");
             if (!CallFromStack(cx, args))
                 goto error;
         }
-        YPHPRINTF("thread_%ld:%s:%d:%s:jump to JSOP_CALL_LENGTH\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("jump to JSOP_CALL_LENGTH");
         Value* newsp = args.spAfterCall();
         TypeScript::Monitor(cx, script, REGS.pc, newsp[-1]);
         REGS.sp = newsp;
@@ -3148,7 +3148,7 @@ CASE(JSOP_FUNCALL)
         TypeMonitorCall(cx, args, construct);
 
         {
-            YPHPRINTF("thread_%ld:%s:%d:%s:create InvokeState && ->jit::MaybeEnterJit()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+            YPHPRINT("create InvokeState && ->jit::MaybeEnterJit()");
             InvokeState state(cx, args, construct);
             jit::EnterJitStatus status = jit::MaybeEnterJit(cx, state);
             switch (status) {
@@ -3200,7 +3200,7 @@ CASE(JSOP_FUNCALL)
     INIT_COVERAGE();
     COUNT_COVERAGE_MAIN();
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:call to interpreter loop\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("call to interpreter loop");
     DumpPC(cx);
     /* Load first op and dispatch it (safe since JSOP_RETRVAL). */
     ADVANCE_AND_DISPATCH(0);

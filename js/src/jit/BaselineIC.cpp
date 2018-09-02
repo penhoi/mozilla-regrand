@@ -2465,7 +2465,7 @@ static bool
 DoCallFallback(JSContext* cx, BaselineFrame* frame, ICCall_Fallback* stub_, uint32_t argc,
                Value* vp, MutableHandleValue res)
 {
-    YPHPRINTF("Begin: May invoked by JIT-code");
+    YPHPRINT("Begin: May invoked by JIT-code");
     // This fallback stub may trigger debug mode toggling.
     DebugModeOSRVolatileStub<ICCall_Fallback*> stub(frame, stub_);
 
@@ -2556,7 +2556,7 @@ DoCallFallback(JSContext* cx, BaselineFrame* frame, ICCall_Fallback* stub_, uint
             ReportValueError(cx, JSMSG_NOT_ITERABLE, -1, callArgs.thisv(), nullptr);
             return false;
         }
-        YPHPRINTF("thread_%ld:%s:%d:%s:->CallFromStack()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+        YPHPRINT("->CallFromStack()");
         if (!CallFromStack(cx, callArgs))
             return false;
 
@@ -2585,7 +2585,7 @@ DoCallFallback(JSContext* cx, BaselineFrame* frame, ICCall_Fallback* stub_, uint
     if (!handled)
         stub->noteUnoptimizableCall();
 
-    YPHPRINTF("End");
+    YPHPRINT("End");
     return true;
 }
 

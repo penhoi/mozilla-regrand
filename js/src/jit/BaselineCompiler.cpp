@@ -47,7 +47,7 @@ BaselineCompiler::BaselineCompiler(JSContext* cx, TempAllocator& alloc, JSScript
     yieldAndAwaitOffsets_(cx),
     modifiesArguments_(false)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s:constuctor @%p \ninherited from BaselineCompilerX64 in turn from BaselineCompilerShared\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, (void*)this);
+    YPHPRINT("constuctor @%p \ninherited from BaselineCompilerX64 in turn from BaselineCompilerShared", (void*)this);
 }
 
 bool
@@ -355,7 +355,7 @@ BaselineCompiler::emitInitializeLocals()
 bool
 BaselineCompiler::emitPrologue()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
 #ifdef JS_USE_LINK_REGISTER
     // Push link register from generateEnterJIT()'s BLR.
     masm.pushReturnAddress();
@@ -448,7 +448,7 @@ BaselineCompiler::emitPrologue()
 bool
 BaselineCompiler::emitEpilogue()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     // Record the offset of the epilogue, so we can do early return from
     // Debugger handlers during on-stack recompile.
     epilogueOffset_ = CodeOffset(masm.currentOffset());
@@ -478,7 +478,7 @@ BaselineCompiler::emitEpilogue()
 bool
 BaselineCompiler::emitOutOfLinePostBarrierSlot()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     masm.bind(&postBarrierSlot_);
 
     Register objReg = R2.scratchReg();
@@ -510,7 +510,7 @@ BaselineCompiler::emitOutOfLinePostBarrierSlot()
 bool
 BaselineCompiler::emitIC(ICStub* stub, ICEntry::Kind kind)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     BaselineICEntry* entry = allocateICEntry(stub, kind);
     if (!entry)
         return false;
@@ -532,7 +532,7 @@ static const VMFunction CheckOverRecursedWithExtraInfo =
 bool
 BaselineCompiler::emitStackCheck(bool earlyCheck)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     Label skipCall;
     uint32_t slotsSize = script->nslots() * sizeof(Value);
     uint32_t tolerance = earlyCheck ? slotsSize : 0;
@@ -594,7 +594,7 @@ BaselineCompiler::emitStackCheck(bool earlyCheck)
 void
 BaselineCompiler::emitIsDebuggeeCheck()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     if (compileDebugInstrumentation_) {
         masm.Push(BaselineFrameReg);
         masm.setupUnalignedABICall(R0.scratchReg());
@@ -612,7 +612,7 @@ static const VMFunction DebugPrologueInfo =
 bool
 BaselineCompiler::emitDebugPrologue()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     if (compileDebugInstrumentation_) {
         // Load pointer to BaselineFrame in R0.
         masm.loadBaselineFramePtr(BaselineFrameReg, R0.scratchReg());
@@ -655,7 +655,7 @@ static const VMFunction InitFunctionEnvironmentObjectsInfo =
 bool
 BaselineCompiler::initEnvironmentChain()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     CallVMPhase phase = POST_INITIALIZE;
     if (needsEarlyStackCheck())
         phase = CHECK_OVER_RECURSED;
@@ -708,7 +708,7 @@ static const VMFunction InterruptCheckInfo =
 bool
 BaselineCompiler::emitInterruptCheck()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     frame.syncStack(0);
 
     Label done;
@@ -734,7 +734,7 @@ static const VMFunction IonCompileScriptForBaselineInfo =
 bool
 BaselineCompiler::emitWarmUpCounterIncrement(bool allowOsr)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     // Emit no warm-up counter increments or bailouts if Ion is not
     // enabled, or if the script will never be Ion-compileable
 
@@ -805,7 +805,7 @@ BaselineCompiler::emitWarmUpCounterIncrement(bool allowOsr)
 bool
 BaselineCompiler::emitArgumentTypeChecks()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     if (!function())
         return true;
 
@@ -831,7 +831,7 @@ BaselineCompiler::emitArgumentTypeChecks()
 bool
 BaselineCompiler::emitDebugTrap()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     MOZ_ASSERT(compileDebugInstrumentation_);
     MOZ_ASSERT(frame.numUnsyncedSlots() == 0);
 
@@ -857,7 +857,7 @@ BaselineCompiler::emitDebugTrap()
 bool
 BaselineCompiler::emitTraceLoggerEnter()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     AllocatableRegisterSet regs(RegisterSet::Volatile());
     Register loggerReg = regs.takeAnyGeneral();
     Register scriptReg = regs.takeAnyGeneral();
@@ -892,7 +892,7 @@ BaselineCompiler::emitTraceLoggerEnter()
 bool
 BaselineCompiler::emitTraceLoggerExit()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     AllocatableRegisterSet regs(RegisterSet::Volatile());
     Register loggerReg = regs.takeAnyGeneral();
 
@@ -916,7 +916,7 @@ BaselineCompiler::emitTraceLoggerExit()
 bool
 BaselineCompiler::emitTraceLoggerResume(Register baselineScript, AllocatableGeneralRegisterSet& regs)
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     Register scriptId = regs.takeAny();
     Register loggerReg = regs.takeAny();
 
@@ -943,7 +943,7 @@ BaselineCompiler::emitTraceLoggerResume(Register baselineScript, AllocatableGene
 void
 BaselineCompiler::emitProfilerEnterFrame()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     // Store stack position to lastProfilingFrame variable, guarded by a toggled jump.
     // Starts off initially disabled.
     Label noInstrument;
@@ -959,7 +959,7 @@ BaselineCompiler::emitProfilerEnterFrame()
 void
 BaselineCompiler::emitProfilerExitFrame()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     // Store previous frame to lastProfilingFrame variable, guarded by a toggled jump.
     // Starts off initially disabled.
     Label noInstrument;
@@ -975,7 +975,7 @@ BaselineCompiler::emitProfilerExitFrame()
 MethodStatus
 BaselineCompiler::emitBody()
 {
-    YPHPRINTF("thread_%ld:%s:%d:%s\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT();
     MOZ_ASSERT(pc == script->code());
 
     bool lastOpUnreachable = false;
@@ -1051,7 +1051,7 @@ BaselineCompiler::emitBody()
 
 #define EMIT_OP(OP)                            \
           case OP:                             \
-            YPHPRINTF("thread_%ld:%s:%d:%s:this->%s()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__, "emit" #OP); \
+            YPHPRINT("this->%s()", "emit" #OP); \
             if (MOZ_UNLIKELY(!this->emit_##OP())) \
                 return Method_Error;           \
             break;
@@ -3424,11 +3424,11 @@ BaselineCompiler::emitCall()
     bool construct = JSOp(*pc) == JSOP_NEW || JSOp(*pc) == JSOP_SUPERCALL;
     uint32_t argc = GET_ARGC(pc);
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:->MacroAssembler::move32() to add MOV inst\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("->MacroAssembler::move32() to add MOV inst");
     frame.syncStack(0);
     masm.move32(Imm32(argc), R0.scratchReg());
 
-    YPHPRINTF("thread_%ld:%s:%d:%s:self->emitOpIC() to generate stub\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("self->emitOpIC() to generate stub");
     // Call IC
     ICCall_Fallback::Compiler stubCompiler(cx, /* isConstructing = */ construct,
                                            /* isSpread = */ false);
@@ -3436,7 +3436,7 @@ BaselineCompiler::emitCall()
         return false;
 
     // Update FrameInfo.
-    YPHPRINTF("thread_%ld:%s:%d:%s:Update FrameInfo inherited from BaselineCompilerShared\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    YPHPRINT("Update FrameInfo inherited from BaselineCompilerShared");
     frame.popn(2 + argc + construct);
     frame.push(R0);
     return true;

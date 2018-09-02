@@ -2389,7 +2389,7 @@ MacroAssembler::AutoProfilerCallInstrumentation::AutoProfilerCallInstrumentation
 void
 MacroAssembler::linkProfilerCallSites(JitCode* code)
 {
-    ::YPHPRINTF("thread_%ld:%s:%d:%s:->PatchDataWithValueCheck()\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    ::YPHPRINT("->PatchDataWithValueCheck()");
     for (size_t i = 0; i < profilerCallSites_.length(); i++) {
         CodeOffset offset = profilerCallSites_[i];
         CodeLocationLabel location(code, offset);
@@ -2826,7 +2826,7 @@ MacroAssembler::callWithABINoProfiler(void* fun, MoveOp::Type result, CheckUnsaf
         pop(ReturnReg);
     }
 #endif
-    ::YPHPRINTF("thread_%ld:%s:%d:%s:self->call(ImmPtr(fun))\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    ::YPHPRINT("self->call(ImmPtr(fun))");
     call(ImmPtr(fun));
 
     callWithABIPost(stackAdjust, result);

@@ -288,7 +288,7 @@ CallJSNative(JSContext* cx, Native native, const CallArgs& args)
     bool alreadyThrowing = cx->isExceptionPending();
 #endif
     assertSameCompartment(cx, args);
-    YPHPRINTF("->native() Invoke native function specified in Native");
+    YPHPRINT("->native() Invoke native function specified in Native");
     bool ok = native(cx, args.length(), args.base());
     if (ok) {
         assertSameCompartment(cx, args.rval());
@@ -305,7 +305,7 @@ CallNativeImpl(JSContext* cx, NativeImpl impl, const CallArgs& args)
     bool alreadyThrowing = cx->isExceptionPending();
 #endif
     assertSameCompartment(cx, args);
-    YPHPRINTF("->impl(cx, args), invoke function specified by NativeImpl@impl");
+    YPHPRINT("->impl(cx, args), invoke function specified by NativeImpl@impl");
     bool ok = impl(cx, args);
     if (ok) {
         assertSameCompartment(cx, args.rval());
@@ -358,7 +358,7 @@ CallJSGetterOp(JSContext* cx, GetterOp op, HandleObject obj, HandleId id,
         return false;
 
     assertSameCompartment(cx, obj, id, vp);
-    YPHPRINTF("->op(cx, obj, id, vp)");
+    YPHPRINT("->op(cx, obj, id, vp)");
     bool ok = op(cx, obj, id, vp);
     if (ok)
         assertSameCompartment(cx, vp);
@@ -373,7 +373,7 @@ CallJSSetterOp(JSContext* cx, SetterOp op, HandleObject obj, HandleId id, Handle
         return false;
 
     assertSameCompartment(cx, obj, id, v);
-    YPHPRINTF("->op(cx, obj, id, v, result)");
+    YPHPRINT("->op(cx, obj, id, v, result)");
     return op(cx, obj, id, v, result);
 }
 
@@ -385,7 +385,7 @@ CallJSAddPropertyOp(JSContext* cx, JSAddPropertyOp op, HandleObject obj, HandleI
         return false;
 
     assertSameCompartment(cx, obj, id, v);
-    YPHPRINTF("->op(cx, obj, id, v)");
+    YPHPRINT("->op(cx, obj, id, v)");
     return op(cx, obj, id, v);
 }
 
@@ -398,7 +398,7 @@ CallJSDeletePropertyOp(JSContext* cx, JSDeletePropertyOp op, HandleObject receiv
 
     assertSameCompartment(cx, receiver, id);
     if (op) {
-        YPHPRINTF("->op(cx, receiver, id, result)");
+        YPHPRINT("->op(cx, receiver, id, result)");
         return op(cx, receiver, id, result);
     }
     return result.succeed();
@@ -411,7 +411,7 @@ CheckForInterrupt(JSContext* cx)
     // Add an inline fast-path since we have to check for interrupts in some hot
     // C++ loops of library builtins.
     if (MOZ_UNLIKELY(cx->hasPendingInterrupt())) {
-        YPHPRINTF("->JSContext::handleInterrupt()");
+        YPHPRINT("->JSContext::handleInterrupt()");
         return cx->handleInterrupt();
     }
 
@@ -522,7 +522,7 @@ inline void
 JSContext::setCompartment(JSCompartment* comp,
                           const js::AutoLockForExclusiveAccess* maybeLock /* = nullptr */)
 {
-    // YPHPRINTF("thread_%ld:%s:%d:%s:bind to a JSCompartment instance\n", gettid(), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    // YPHPRINT("bind to a JSCompartment instance");
     // Only one thread can be in the atoms compartment at a time.
     MOZ_ASSERT_IF(runtime_->isAtomsCompartment(comp), maybeLock != nullptr);
     MOZ_ASSERT_IF(runtime_->isAtomsCompartment(comp) || runtime_->isAtomsCompartment(compartment_),

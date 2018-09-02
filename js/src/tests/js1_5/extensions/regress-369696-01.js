@@ -22,7 +22,7 @@ function test()
   q = [];
   q.__defineGetter__("0", q.toString);
   q[2] = q;
-  assertEq(q.toSource(), "[\"\", , []]", "wrong string");
+  assertEq(q.toSource(), "[\"\", []]", "wrong string");
 
   reportCompare(expect, actual, summary);
 }
