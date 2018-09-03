@@ -173,7 +173,7 @@ BaselineCacheIRCompiler::compile()
         switch (reader.readOp()) {
 #define DEFINE_OP(op)                   \
           case CacheOp::op:             \
-            YPHPRINT("->%s()", "emit" #op); \
+            YPHPRINT("this->%s()", "emit" #op); \
             if (!emit##op())            \
                 return nullptr;         \
             break;

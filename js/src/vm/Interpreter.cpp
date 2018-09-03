@@ -1744,7 +1744,7 @@ Interpret(JSContext* cx, RunState& state)
 // Non-standard but faster indirect-goto-based dispatch.
 # define INTERPRETER_LOOP()
 # define CASE(OP)                 label_##OP:   \
-                                  printf("label:%s", #OP);
+                                  YPHPRINT("goto label_%s", #OP);
 
 # define DEFAULT()                label_default:
 # define DISPATCH_TO(OP)          goto* addresses[(OP)]
@@ -1768,7 +1768,7 @@ Interpret(JSContext* cx, RunState& state)
 // Portable switch-based dispatch.
 # define INTERPRETER_LOOP()       the_switch: switch (switchOp)
 # define CASE(OP)                 case OP:      \
-                                  printf("OP-code:%s", #OP);
+                                  YPHPRINT("goto case %s:", #OP);
 
 # define DEFAULT()                default:
 # define DISPATCH_TO(OP)                                                      \
@@ -3123,7 +3123,6 @@ CASE(JSOP_FUNCALL)
             if (!CallFromStack(cx, args))
                 goto error;
         }
-        YPHPRINT("jump to JSOP_CALL_LENGTH");
         Value* newsp = args.spAfterCall();
         TypeScript::Monitor(cx, script, REGS.pc, newsp[-1]);
         REGS.sp = newsp;

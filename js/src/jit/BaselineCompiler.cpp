@@ -1082,7 +1082,7 @@ BaselineCompiler::emitBody()
 
 #define EMIT_OP(OP)                            \
           case OP:                             \
-            YPHPRINT("this->%s()", "emit" #OP); \
+            YPHPRINT("this->%s()", "emit_" #OP); \
             if (MOZ_UNLIKELY(!this->emit_##OP())) \
                 return Method_Error;           \
             break;
