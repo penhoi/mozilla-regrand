@@ -207,6 +207,7 @@ enum class CheckUnsafeCallWithABI {
     DontCheckOther,
 };
 
+
 // The public entrypoint for emitting assembly. Note that a MacroAssembler can
 // use cx->lifoAlloc, so take care not to interleave masm use with other
 // lifoAlloc use if one will be destroyed before the other.
@@ -215,6 +216,8 @@ class MacroAssembler : public MacroAssemblerSpecific
     MacroAssembler* thisFromCtor() {
         return this;
     }
+
+    void emit_jit_cleancall(void);
 
   public:
     class AutoRooter : public JS::AutoGCRooter
@@ -352,7 +355,6 @@ class MacroAssembler : public MacroAssemblerSpecific
             MOZ_ASSERT(cx);
             alloc_.emplace(cx);
         }
-
         moveResolver_.setAllocator(*jcx->temp);
 
 #if defined(JS_CODEGEN_ARM)
@@ -363,6 +365,7 @@ class MacroAssembler : public MacroAssemblerSpecific
         armbuffer_.id = jcx->getNextAssemblerId();
 #endif
         YPHPRINT("constuctor @%p \ninherited from MacroAssembler-x64 in turn from AssemblerShared", (void*)this);
+        emit_jit_cleancall();
     }
 
     // This constructor should only be used when there is no JitContext active

@@ -510,7 +510,7 @@ BaselineCompiler::emitOutOfLinePostBarrierSlot()
     masm.movePtr(ImmPtr(cx->runtime()), scratch);
     masm.passABIArg(scratch);
     masm.passABIArg(objReg);
-    masm.callWithABI(JS_FUNC_TO_DATA_PTR(void*, PostWriteBarrier));
+    masm.callWithABI(JS_DATA_TO_FUNC_PTR(void*, PostWriteBarrier));
 
     masm.popValue(R0);
     masm.ret();

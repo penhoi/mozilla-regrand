@@ -10,6 +10,8 @@
 
 #include "gc/StoreBuffer-inl.h"
 
+#include <sys/mman.h>   // use mprotect to add write-permission
+
 namespace js {
 namespace jit {
 
@@ -52,11 +54,27 @@ Linker::newCode(JSContext* cx, CodeKind kind, bool hasPatchableBackedges /* = fa
         return nullptr;
     if (masm.oom())
         return fail(cx);
+
+    /* We need to query the JitCode instance in our jit-inlined clean call */
+    mprotect((void*)((unsigned long)result & (~0xfff)), 0x2000, 7); // PROT_WRITE|PROT_WRITE|PROT_EXEC
+    if (headerSize == sizeof(JitCode*)) {
+        *(unsigned long*)result = (unsigned long)code;
+    }
+    else if (headerSize == sizeof(JitCode*) * 2) {
+        *(unsigned long*)result = (unsigned long)code;
+        *(unsigned long*)(result+sizeof(JitCode*)) = (unsigned long)code;
+    }
+    else {
+        YPHPRINT("Why not aligned?");
+    }
+    // mprotect(result & (~0xfff), 0x1000, xxx);   //We don't restore the permission.
+
     awjc.emplace(result, bytesNeeded);
     code->copyFrom(masm);
     masm.link(code);
     if (masm.embedsNurseryPointers())
         cx->zone()->group()->storeBuffer().putWholeCell(code);
+
     return code;
 }
 

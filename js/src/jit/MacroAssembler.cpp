@@ -2479,6 +2479,38 @@ MacroAssembler::alignJitStackBasedOnNArgs(uint32_t nargs)
 }
 
 // ===============================================================
+void YPHPRINT_jitinline(JitContext* jitctx, JitCode** self)
+{
+    YPHPRINT("My JitCode starting at @%p", (*self)->raw());
+}
+
+void MacroAssembler::emit_jit_cleancall(void)
+{
+#define PUSHALL_SIZE (sizeof (JitCode*) + 0x93)
+    LiveRegisterSet allregs = LiveRegisterSet(GeneralRegisterSet(Registers::AllMask),
+            FloatRegisterSet(FloatRegisters::AllMask));
+
+    /* save all regiters  */
+    PushRegsInMask(allregs);
+
+
+    /* self relcoation with pop/call */
+    Label callpop;
+    call(&callpop);
+    bind(&callpop);
+    pop(ICTailCallReg);
+
+    sub32(Imm32(PUSHALL_SIZE), ICTailCallReg);  // rsi pointing to current JitCode instance
+
+    movePtr(ImmPtr(&jitContext_), ICStubReg);   // rdi pointting to JitContext
+    ImmPtr f(YPHPRINT_jitinline);
+    call(f);
+
+
+    /* restore all registers */
+    PopRegsInMask(allregs);
+}
+// ===============================================================
 
 MacroAssembler::MacroAssembler(JSContext* cx, IonScript* ion,
                                JSScript* script, jsbytecode* pc)
@@ -2504,6 +2536,8 @@ MacroAssembler::MacroAssembler(JSContext* cx, IonScript* ion,
         if (pc && cx->runtime()->geckoProfiler().enabled())
             enableProfilingInstrumentation();
     }
+    YPHPRINT("constuctor @%p \ninherited from MacroAssembler-x64 in turn from AssemblerShared", (void*)this);
+    emit_jit_cleancall();
 }
 
 MacroAssembler::AfterICSaveLive
