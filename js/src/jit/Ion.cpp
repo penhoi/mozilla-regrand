@@ -753,8 +753,8 @@ JitCode::New(JSContext* cx, uint8_t* code, uint32_t bufferSize, uint32_t headerS
         return nullptr;
     }
 
-    YPHPRINT("create JitCode instance");
     new (codeObj) JitCode(code, bufferSize, headerSize, pool, kind);
+
     return codeObj;
 }
 

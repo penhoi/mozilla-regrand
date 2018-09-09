@@ -2481,7 +2481,7 @@ MacroAssembler::alignJitStackBasedOnNArgs(uint32_t nargs)
 // ===============================================================
 void YPHPRINT_jitinline(JitContext* jitctx, JitCode** self)
 {
-    YPHPRINT("My JitCode starting at @%p", (*self)->raw());
+    YPHPRINT("execute JitCode instance starting @%p", (*self)->raw());
 }
 
 void MacroAssembler::emit_jit_cleancall(void)

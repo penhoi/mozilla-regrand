@@ -45,7 +45,6 @@ Linker::newCode(JSContext* cx, CodeKind kind, bool hasPatchableBackedges /* = fa
     uint8_t* codeStart = result + sizeof(JitCode*);
 
     // Bump the code up to a nice alignment.
-    YPHPRINT("create JitCode instance");
     codeStart = (uint8_t*)AlignBytes((uintptr_t)codeStart, CodeAlignment);
     uint32_t headerSize = codeStart - result;
     JitCode* code = JitCode::New<allowGC>(cx, codeStart, bytesNeeded - headerSize,
@@ -75,6 +74,7 @@ Linker::newCode(JSContext* cx, CodeKind kind, bool hasPatchableBackedges /* = fa
     if (masm.embedsNurseryPointers())
         cx->zone()->group()->storeBuffer().putWholeCell(code);
 
+    YPHPRINT("create JitCode instance starting @%p", code->raw());
     return code;
 }
 
