@@ -605,6 +605,7 @@ JitRuntime::generateBailoutHandler(MacroAssembler& masm, Label* bailoutTail)
 bool
 JitRuntime::generateVMWrapper(JSContext* cx, MacroAssembler& masm, const VMFunction& f)
 {
+    YPHPRINT("Begin:%s", f.name_);
     YPHPRINT("User standard x64 fastcall convention?");
     MOZ_ASSERT(functionWrappers_);
     MOZ_ASSERT(functionWrappers_->initialized());
@@ -774,7 +775,9 @@ JitRuntime::generateVMWrapper(JSContext* cx, MacroAssembler& masm, const VMFunct
                     f.explicitStackSlots() * sizeof(void*) +
                     f.extraValuesToPop * sizeof(Value)));
 
-    return functionWrappers_->putNew(&f, wrapperOffset);
+    bool res = functionWrappers_->putNew(&f, wrapperOffset);
+    YPHPRINT("End");
+    return res;
 }
 
 uint32_t

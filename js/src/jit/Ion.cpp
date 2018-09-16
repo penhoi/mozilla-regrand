@@ -248,7 +248,7 @@ JitRuntime::initialize(JSContext* cx, AutoLockForExclusiveAccess& lock)
     if (!functionWrappers_ || !functionWrappers_->init())
         return false;
 
-    YPHPRINT("create stubs including bailoutTail && malloc stub && free stub ...");
+    YPHPRINT("Begin: create stubs including bailoutTail && malloc stub && free stub ...");
 
     MacroAssembler masm;
 
@@ -340,6 +340,7 @@ JitRuntime::initialize(JSContext* cx, AutoLockForExclusiveAccess& lock)
     void* handler = JS_FUNC_TO_DATA_PTR(void*, jit::HandleException);
     generateExceptionTailStub(masm, handler, &profilerExitTail);
 
+    YPHPRINT("End: create stubs including bailoutTail && malloc stub && free stub ...");
     Linker linker(masm);
     AutoFlushICache afc("Trampolines");
     trampolineCode_ = linker.newCode<NoGC>(cx, OTHER_CODE);
@@ -364,6 +365,7 @@ JitCode*
 JitRuntime::debugTrapHandler(JSContext* cx)
 {
     if (!debugTrapHandler_) {
+        YPHPRINT("User standard x64 fastcall convention?");
         // JitRuntime code stubs are shared across compartments and have to
         // be allocated in the atoms compartment.
         AutoLockForExclusiveAccess lock(cx);
