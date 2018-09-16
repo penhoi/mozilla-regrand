@@ -34,7 +34,7 @@ static const LiveRegisterSet AllRegs =
 void
 JitRuntime::generateEnterJIT(JSContext* cx, MacroAssembler& masm)
 {
-    YPHPRINT("User standard x64 fastcall convention");
+    YPHPRINT("User standard x64 fastcall convention?");
     enterJITOffset_ = startTrampolineCode(masm);
 
     masm.assertStackAlignment(ABIStackAlignment, -int32_t(sizeof(uintptr_t)) /* return address */);
@@ -343,6 +343,7 @@ JitRuntime::generateEnterJIT(JSContext* cx, MacroAssembler& masm)
 void
 JitRuntime::generateInvalidator(MacroAssembler& masm, Label* bailoutTail)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     // See explanatory comment in x86's JitRuntime::generateInvalidator.
 
     invalidatorOffset_ = startTrampolineCode(masm);
@@ -382,8 +383,8 @@ JitRuntime::generateInvalidator(MacroAssembler& masm, Label* bailoutTail)
 void
 JitRuntime::generateArgumentsRectifier(MacroAssembler& masm)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     // Do not erase the frame pointer in this function.
-
     argumentsRectifierOffset_ = startTrampolineCode(masm);
 
     // Caller:
@@ -595,6 +596,7 @@ JitRuntime::generateBailoutTable(MacroAssembler& masm, Label* bailoutTail, uint3
 void
 JitRuntime::generateBailoutHandler(MacroAssembler& masm, Label* bailoutTail)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     bailoutHandlerOffset_ = startTrampolineCode(masm);
 
     GenerateBailoutThunk(masm, NO_FRAME_SIZE_CLASS_ID, bailoutTail);
@@ -603,7 +605,7 @@ JitRuntime::generateBailoutHandler(MacroAssembler& masm, Label* bailoutTail)
 bool
 JitRuntime::generateVMWrapper(JSContext* cx, MacroAssembler& masm, const VMFunction& f)
 {
-    YPHPRINT("call wrapper function abiding ABI convention");
+    YPHPRINT("User standard x64 fastcall convention?");
     MOZ_ASSERT(functionWrappers_);
     MOZ_ASSERT(functionWrappers_->initialized());
 
@@ -778,6 +780,7 @@ JitRuntime::generateVMWrapper(JSContext* cx, MacroAssembler& masm, const VMFunct
 uint32_t
 JitRuntime::generatePreBarrier(JSContext* cx, MacroAssembler& masm, MIRType type)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     uint32_t offset = startTrampolineCode(masm);
 
     MOZ_ASSERT(PreBarrierReg == rdx);
@@ -899,6 +902,7 @@ JitRuntime::generateDebugTrapHandler(JSContext* cx)
 void
 JitRuntime::generateExceptionTailStub(MacroAssembler& masm, void* handler, Label* profilerExitTail)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     exceptionTailOffset_ = startTrampolineCode(masm);
 
     masm.bind(masm.failureLabel());
@@ -908,6 +912,7 @@ JitRuntime::generateExceptionTailStub(MacroAssembler& masm, void* handler, Label
 void
 JitRuntime::generateBailoutTailStub(MacroAssembler& masm, Label* bailoutTail)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     bailoutTailOffset_ = startTrampolineCode(masm);
     masm.bind(bailoutTail);
 
@@ -917,6 +922,7 @@ JitRuntime::generateBailoutTailStub(MacroAssembler& masm, Label* bailoutTail)
 void
 JitRuntime::generateProfilerExitFrameTailStub(MacroAssembler& masm, Label* profilerExitTail)
 {
+    YPHPRINT("User standard x64 fastcall convention?");
     profilerExitFrameTailOffset_ = startTrampolineCode(masm);
     masm.bind(profilerExitTail);
 
