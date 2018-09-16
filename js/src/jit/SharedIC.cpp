@@ -513,6 +513,7 @@ ICStubCompiler::getStubCode()
     if (stubCode)
         return stubCode;
 
+    YPHPRINT("Compile new stubcode");
     // Compile new stubcode.
     JitContext jctx(cx, nullptr);
     MacroAssembler masm;
@@ -917,6 +918,7 @@ static const VMFunction DoBinaryArithFallbackInfo =
 bool
 ICBinaryArith_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(R0 == JSReturnOperand);
 
     // Restore the tail call register.
@@ -932,7 +934,9 @@ ICBinaryArith_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
     masm.push(ICStubReg);
     pushStubPayload(masm, R0.scratchReg());
 
-    return tailCallVM(DoBinaryArithFallbackInfo, masm);
+    bool res tailCallVM(DoBinaryArithFallbackInfo, masm);
+    YPHPRINT("End");
+    return res;
 }
 
 static bool
@@ -953,6 +957,7 @@ static const VMFunction DoConcatStringsInfo =
 bool
 ICBinaryArith_StringConcat::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.branchTestString(Assembler::NotEqual, R0, &failure);
     masm.branchTestString(Assembler::NotEqual, R1, &failure);
@@ -971,6 +976,7 @@ ICBinaryArith_StringConcat::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
@@ -1034,6 +1040,7 @@ static const VMFunction DoConcatStringObjectInfo =
 bool
 ICBinaryArith_StringObjectConcat::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     if (lhsIsString_) {
         masm.branchTestString(Assembler::NotEqual, R0, &failure);
@@ -1060,12 +1067,14 @@ ICBinaryArith_StringObjectConcat::Compiler::generateStubCode(MacroAssembler& mas
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
 bool
 ICBinaryArith_Double::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.ensureDouble(R0, FloatReg0, &failure);
     masm.ensureDouble(R1, FloatReg1, &failure);
@@ -1100,12 +1109,14 @@ ICBinaryArith_Double::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
 bool
 ICBinaryArith_BooleanWithInt32::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     if (lhsIsBool_)
         masm.branchTestBoolean(Assembler::NotEqual, R0, &failure);
@@ -1175,12 +1186,14 @@ ICBinaryArith_BooleanWithInt32::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
 bool
 ICBinaryArith_DoubleWithInt32::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(op == JSOP_BITOR || op == JSOP_BITAND || op == JSOP_BITXOR);
 
     Label failure;
@@ -1240,6 +1253,7 @@ ICBinaryArith_DoubleWithInt32::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
@@ -1326,6 +1340,7 @@ static const VMFunction DoUnaryArithFallbackInfo =
 bool
 ICUnaryArith_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(R0 == JSReturnOperand);
 
     // Restore the tail call register.
@@ -1339,12 +1354,15 @@ ICUnaryArith_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
     masm.push(ICStubReg);
     pushStubPayload(masm, R0.scratchReg());
 
-    return tailCallVM(DoUnaryArithFallbackInfo, masm);
+    bool res = tailCallVM(DoUnaryArithFallbackInfo, masm);
+    YPHPRINT("Begin");
+    return res;
 }
 
 bool
 ICUnaryArith_Double::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.ensureDouble(R0, FloatReg0, &failure);
 
@@ -1379,6 +1397,7 @@ ICUnaryArith_Double::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
@@ -1611,6 +1630,7 @@ static const VMFunction DoCompareFallbackInfo =
 bool
 ICCompare_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(R0 == JSReturnOperand);
 
     // Restore the tail call register.
@@ -1625,7 +1645,9 @@ ICCompare_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
     masm.pushValue(R0);
     masm.push(ICStubReg);
     pushStubPayload(masm, R0.scratchReg());
-    return tailCallVM(DoCompareFallbackInfo, masm);
+    bool res = tailCallVM(DoCompareFallbackInfo, masm);
+    YPHPRINT("End");
+    return res;
 }
 
 //
@@ -1635,6 +1657,7 @@ ICCompare_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_String::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.branchTestString(Assembler::NotEqual, R0, &failure);
     masm.branchTestString(Assembler::NotEqual, R1, &failure);
@@ -1653,6 +1676,7 @@ ICCompare_String::Compiler::generateStubCode(MacroAssembler& masm)
 
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
@@ -1663,6 +1687,7 @@ ICCompare_String::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_Symbol::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.branchTestSymbol(Assembler::NotEqual, R0, &failure);
     masm.branchTestSymbol(Assembler::NotEqual, R1, &failure);
@@ -1685,6 +1710,7 @@ ICCompare_Symbol::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
@@ -1695,6 +1721,7 @@ ICCompare_Symbol::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_Boolean::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.branchTestBoolean(Assembler::NotEqual, R0, &failure);
     masm.branchTestBoolean(Assembler::NotEqual, R1, &failure);
@@ -1713,6 +1740,7 @@ ICCompare_Boolean::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+    YPHPRINT("End");
     return true;
 }
 
@@ -1723,6 +1751,7 @@ ICCompare_Boolean::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_NumberWithUndefined::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     ValueOperand numberOperand, undefinedOperand;
     if (lhsIsUndefined) {
         numberOperand = R1;
@@ -1745,6 +1774,8 @@ ICCompare_NumberWithUndefined::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+
+    YPHPRINT("End");
     return true;
 }
 
@@ -1755,6 +1786,7 @@ ICCompare_NumberWithUndefined::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_Object::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     masm.branchTestObject(Assembler::NotEqual, R0, &failure);
     masm.branchTestObject(Assembler::NotEqual, R1, &failure);
@@ -1777,6 +1809,8 @@ ICCompare_Object::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+
+    YPHPRINT("End");
     return true;
 }
 
@@ -1787,6 +1821,7 @@ ICCompare_Object::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_ObjectWithUndefined::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(IsEqualityOp(op));
 
     ValueOperand objectOperand, undefinedOperand;
@@ -1865,6 +1900,8 @@ ICCompare_ObjectWithUndefined::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+
+    YPHPRINT("End");
     return true;
 }
 
@@ -1875,6 +1912,7 @@ ICCompare_ObjectWithUndefined::Compiler::generateStubCode(MacroAssembler& masm)
 bool
 ICCompare_Int32WithBoolean::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label failure;
     ValueOperand int32Val;
     ValueOperand boolVal;
@@ -1909,6 +1947,8 @@ ICCompare_Int32WithBoolean::Compiler::generateStubCode(MacroAssembler& masm)
     // Failure case - jump to next stub
     masm.bind(&failure);
     EmitStubGuardFailure(masm);
+
+    YPHPRINT("End");
     return true;
 }
 
@@ -2131,6 +2171,7 @@ static const VMFunction DoGetPropSuperFallbackInfo =
 bool
 ICGetProp_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(R0 == JSReturnOperand);
 
     EmitRestoreTailCallReg(masm);
@@ -2174,6 +2215,7 @@ ICGetProp_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
                  ICStubReg);
     EmitEnterTypeMonitorIC(masm, ICTypeMonitor_Fallback::offsetOfFirstMonitorStub());
 
+    YPHPRINT("End");
     return true;
 }
 
@@ -2461,6 +2503,7 @@ static const VMFunction DoTypeMonitorFallbackInfo =
 bool
 ICTypeMonitor_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     MOZ_ASSERT(R0 == JSReturnOperand);
 
     // Restore the tail call register.
@@ -2470,12 +2513,16 @@ ICTypeMonitor_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
     masm.push(ICStubReg);
     masm.pushBaselineFramePtr(BaselineFrameReg, R0.scratchReg());
 
-    return tailCallVM(DoTypeMonitorFallbackInfo, masm);
+    bool res = tailCallVM(DoTypeMonitorFallbackInfo, masm);
+    YPHPRINT("End");
+
+    return res;
 }
 
 bool
 ICTypeMonitor_PrimitiveSet::Compiler::generateStubCode(MacroAssembler& masm)
 {
+    YPHPRINT("Begin");
     Label success;
     if ((flags_ & TypeToFlag(JSVAL_TYPE_INT32)) && !(flags_ & TypeToFlag(JSVAL_TYPE_DOUBLE)))
         masm.branchTestInt32(Assembler::Equal, R0, &success);
@@ -2505,6 +2552,8 @@ ICTypeMonitor_PrimitiveSet::Compiler::generateStubCode(MacroAssembler& masm)
 
     masm.bind(&success);
     EmitReturnFromIC(masm);
+
+    YPHPRINT("End");
     return true;
 }
 
