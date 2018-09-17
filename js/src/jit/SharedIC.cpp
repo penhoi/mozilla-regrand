@@ -934,7 +934,7 @@ ICBinaryArith_Fallback::Compiler::generateStubCode(MacroAssembler& masm)
     masm.push(ICStubReg);
     pushStubPayload(masm, R0.scratchReg());
 
-    bool res tailCallVM(DoBinaryArithFallbackInfo, masm);
+    bool res = tailCallVM(DoBinaryArithFallbackInfo, masm);
     YPHPRINT("End");
     return res;
 }
